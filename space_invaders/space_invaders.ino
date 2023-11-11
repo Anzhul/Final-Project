@@ -3,7 +3,6 @@
 #include <Adafruit_GFX.h>
 
 
-Write something stupid
 
 // define the wiring of the LED screen
 const uint8_t CLK  = 8;
@@ -12,6 +11,11 @@ const uint8_t OE = 9;
 const uint8_t A = A0;
 const uint8_t B = A1;
 const uint8_t C = A2;
+
+// Matrix Dimensions
+// Added by xiaoym
+const uint8_t MAT_WIDTH = 32;
+const uint8_t MAT_HEIGHT = 16;
 
 // define the wiring of the inputs
 const int POTENTIOMETER_PIN_NUMBER = 5;
@@ -118,43 +122,86 @@ class Invader {
 
 class Cannonball {
   public:
+    // Default constructor of Cannonball
     Cannonball() {
+      // Default coordinates x and y are initialized
+      x = 0;
+      y = 0;
+      // Default status is not fired
+      fired = false;
+    }
+    
+    // Resets private data members to initial values
+    void reset() {
       x = 0;
       y = 0;
       fired = false;
     }
     
-    // resets private data members to initial values
-    void reset() {
-    }
-    
-    // getters
+    // Getters
     int get_x() const {
+      return x;
     }
+
     int get_y() const {
+      return y;
     }
+
     bool has_been_fired() const {
+      return fired;
     }
     
-    // sets private data members
-    void fire(int x_arg, int y_arg) {
+    // Setters
+    // Default argument for y is MAT_HEIGHT - 2 = 14
+    // i.e. the y-coordinate of the cannon
+    void fire(int x_arg, int y_arg = MAT_HEIGHT - 2) {
+      x = x_arg;
+      y = y_arg;
+      fired = true;
     }
     
-    // moves the Cannonball and detects if it goes off the screen
+    // Moves the Cannonball and detects if it goes off the screen
     // Modifies: y, fired
+    // Member function Cannonball::draw() is called in this function
+    // i.e. the Cannonball is moved and drawn here
     void move() {
+     if (fired) {
+      // Erase from its original position
+      erase();
+      // Move to its next position
+      y--;
+      // If goes off the screen, reset
+      if (y < 0) {
+        reset();
+      }
+      // If still in the screen, draw
+      else {
+        draw();
+      }
+     }
     }
     
-    // resets private data members to initial values
+    // Resets private data members to initial values
     void hit() {
+      erase();
+      reset();
     }
     
-    // draws the Cannonball, if it is fired
+    // Draws the Cannonball, if it is fired
     void draw() {
+      if (fired) {
+      matrix.drawPixel(x, y, ORANGE.to_333());
+      matrix.drawPixel(x, y - 1, ORANGE.to_333());
+      }
+      else {
+        Serial.println("Cannot draw! No cannonball is fired.");
+      }
     }
     
-    // draws black where the Cannonball used to be
+    // Draws black where the Cannonball used to be
     void erase() {
+      matrix.drawPixel(x, y, BLACK.to_333());
+      matrix.drawPixel(x, y - 1, BLACK.to_333);
     }
 
   private:
