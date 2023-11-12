@@ -73,30 +73,48 @@ class Invader {
     }
     // sets values for private date members x and y
     Invader(int x_arg, int y_arg) {
+      x = x_arg;
+      y = y_arg;
     }
     // sets values for private data members
     Invader(int x_arg, int y_arg, int strength_arg) {
+      x = x_arg;
+      y = y_arg;
+      strength = strength_arg;
     }
     // sets values for private data members
     void initialize(int x_arg, int y_arg, int strength_arg) {
+      x = x_arg;
+      y = y_arg;
+      strength = strength_arg;
     }
     
     // getters
     int get_x() const {
+      return x;
     }
     int get_y() const {
+      return y;
     }
     int get_strength() const {
+      return strength;
     }
 
     // Moves the Invader down the screen by one row
     // Modifies: y
     void move() {
+      
     }
     
     // draws the Invader if its strength is greater than 0
     // calls: draw_with_rgb
     void draw() {
+      if(strength == 0){
+        draw_with_rgb(GREEN,RED);
+      }
+      if(strength == 1){
+        draw_with_rgb(GREEN,RED);
+      }
     }
     
     // draws black where the Invader used to be
@@ -108,6 +126,11 @@ class Invader {
     // Modifies: strength
     // calls: draw, erase
     void hit() {
+      strength -= 1;
+      if (strength < 0){
+        erase();
+      }
+
     }
 
   private:
@@ -117,6 +140,19 @@ class Invader {
     
     // draws the Invader
     void draw_with_rgb(Color body_color, Color eye_color) {
+      matrix.drawPixel(x+1, y, body_color.to_333());
+      matrix.drawPixel(x+2, y, body_color.to_333());
+      matrix.drawPixel(x, y+1, body_color.to_333());
+      matrix.drawPixel(x+1, y+1, eye_color.to_333());
+      matrix.drawPixel(x+2, y+1, eye_color.to_333());
+      matrix.drawPixel(x+3, y+1, body_color.to_333());
+      matrix.drawPixel(x, y+1, body_color.to_333());
+      matrix.drawPixel(x, y+2, body_color.to_333());
+      matrix.drawPixel(x+1, y+2, body_color.to_333());
+      matrix.drawPixel(x+2, y+2, body_color.to_333());
+      matrix.drawPixel(x+3, y+2, body_color.to_333());
+      matrix.drawPixel(x+0, y+3, body_color.to_333());
+      matrix.drawPixel(x+3, y+3, body_color.to_333());
     }
 };
 
@@ -201,7 +237,7 @@ class Cannonball {
     // Draws black where the Cannonball used to be
     void erase() {
       matrix.drawPixel(x, y, BLACK.to_333());
-      matrix.drawPixel(x, y - 1, BLACK.to_333);
+      matrix.drawPixel(x, y - 1, BLACK.to_333());
     }
 
   private:
@@ -307,18 +343,36 @@ void loop() {
   int potentiometer_value = analogRead(POTENTIOMETER_PIN_NUMBER);
   bool button_pressed = (digitalRead(BUTTON_PIN_NUMBER) == HIGH);
   game.update(potentiometer_value, button_pressed);
+  Invader c; 
+  c.draw();
+  //print_level(3);
+  //print_lives(8);
+  //game_over();
 }
 
 // displays Level
 void print_level(int level) {
+    matrix.setTextSize(1);
+    matrix.setTextColor(WHITE.to_333());
+    matrix.setCursor(0, 0);  // Set the starting position
+    matrix.print("Level:" );
+    matrix.print(level);
 }
 
 // displays number of lives
 void print_lives(int lives) {
+    matrix.setTextSize(1);
+    matrix.setTextColor(WHITE.to_333());
+    matrix.setCursor(0, 0);  // Set the starting position
+    matrix.print("Lives:" );
+    matrix.print(lives);
 }
 
 // displays "game over"
 void game_over() {
-
+    matrix.setTextSize(1);
+    matrix.setTextColor(RED.to_333());
+    matrix.setCursor(0, 0);  // Set the starting position
+    matrix.print("Game Over");
 }
 
