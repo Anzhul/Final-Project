@@ -68,6 +68,7 @@ class Invader {
     // Constructors
     Invader() {
       x = 0;
+      // Why is the default value for y = -4?
       y = -4;
       strength = 0;
     }
@@ -103,9 +104,11 @@ class Invader {
     // Moves the Invader down the screen by one row
     // Modifies: y
     void move() {
-      //Each time it's called in the loop this moves to invader down one pixel.
-      if (y<32){
-        y += 1;
+      // Each time it's called in the loop this moves to invader down one pixel
+      // The value of y is [0, 15]. MAT_HEIGHT = 16.
+      if (y < MAT_HEIGHT){
+        // Previous condition for y is y < 32, why?
+        y++;
       }
     }
     
@@ -136,7 +139,8 @@ class Invader {
     // calls: draw, erase
     void hit() {
       strength -= 1;
-      if (strength < 0){
+      // Previous condition for strength is strength < 0
+      if (strength <= 0){
         erase();
       }
 
@@ -151,19 +155,19 @@ class Invader {
     void draw_with_rgb(Color body_color, Color eye_color) {
       //Each of these specifies a specific point on the grid. 
       //The origin (x,y) is the upper left corner of the invader.
-      matrix.drawPixel(x+1, y, body_color.to_333());
-      matrix.drawPixel(x+2, y, body_color.to_333());
-      matrix.drawPixel(x, y+1, body_color.to_333());
-      matrix.drawPixel(x+1, y+1, eye_color.to_333());
-      matrix.drawPixel(x+2, y+1, eye_color.to_333());
-      matrix.drawPixel(x+3, y+1, body_color.to_333());
-      matrix.drawPixel(x, y+1, body_color.to_333());
-      matrix.drawPixel(x, y+2, body_color.to_333());
-      matrix.drawPixel(x+1, y+2, body_color.to_333());
-      matrix.drawPixel(x+2, y+2, body_color.to_333());
-      matrix.drawPixel(x+3, y+2, body_color.to_333());
-      matrix.drawPixel(x+0, y+3, body_color.to_333());
-      matrix.drawPixel(x+3, y+3, body_color.to_333());
+      matrix.drawPixel(x + 1, y, body_color.to_333());
+      matrix.drawPixel(x + 2, y, body_color.to_333());
+      matrix.drawPixel(x, y + 1, body_color.to_333());
+      matrix.drawPixel(x + 1, y + 1, eye_color.to_333());
+      matrix.drawPixel(x + 2, y + 1, eye_color.to_333());
+      matrix.drawPixel(x + 3, y + 1, body_color.to_333());
+      matrix.drawPixel(x, y + 1, body_color.to_333());
+      matrix.drawPixel(x, y + 2, body_color.to_333());
+      matrix.drawPixel(x + 1, y + 2, body_color.to_333());
+      matrix.drawPixel(x + 2, y + 2, body_color.to_333());
+      matrix.drawPixel(x + 3, y + 2, body_color.to_333());
+      matrix.drawPixel(x, y + 3, body_color.to_333());
+      matrix.drawPixel(x + 3, y + 3, body_color.to_333());
     }
 };
 
@@ -240,6 +244,7 @@ class Cannonball {
       matrix.drawPixel(x, y, ORANGE.to_333());
       matrix.drawPixel(x, y - 1, ORANGE.to_333());
       }
+      // Print alert message
       else {
         Serial.println("Cannot draw! No cannonball is fired.");
       }
@@ -339,9 +344,10 @@ class Game {
     // sets up a new game of Space Invaders
     // Modifies: global variable matrix
     void setupGame() {
-      //Testing the invaders, iterates through and creates the aliens
-        for (int i=0; i<(32/4); i++){
-          enemies[i]= Invader(i*4, -4,i%2);
+      // Testing the invaders, iterates through and creates the Invaders
+        // MAT_WIDTH = 32
+        for (int i = 0; i < (MAT_WIDTH / 4); i++){
+          enemies[i]= Invader(i * 4, -4, i % 2);
         }
     }
     
@@ -350,7 +356,8 @@ class Game {
     // Modifies: global variable matrix
     void update(int potentiometer_value, bool button_pressed) {
       //Testing the invaders, iterates through and moves/draws/erases all the aliens every cycle
-        for (int i=0; i<(32/4); i++){
+        // MAT_WIDTH = 32
+        for (int i = 0; i < (MAT_WIDTH / 4); i++){
           enemies[i].erase();
           enemies[i].draw();
           enemies[i].move();
