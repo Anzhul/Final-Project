@@ -267,28 +267,38 @@ class Player {
     
     // getters
     int get_x() const {
+      return x;
     }
     int get_y() const {
+      return y;
     }
     int get_lives() const {
+      return lives;
     }
     
     // setter
     void set_x(int x_arg) {
+      x = x_arg;
     }
     
     // Modifies: lives
     void die() {
+      if (lives > 0) {
+        lives--;
+      }
     }
     
     // draws the Player
     // calls: draw_with_rgb
     void draw() {
+      //The player is always aquamarine in color.
+      draw_with_rgb(AQUA);
     }
     
     // draws black where the Player used to be
     // calls: draw_with_rgb
     void erase() {
+      draw_with_rgb(BLACK);
     }
 
   private:
@@ -298,10 +308,24 @@ class Player {
 
     // sets private data members x and y to initial values
     void initialize(int x_arg, int y_arg) {
+      x = x_arg;
+      y = y_arg;
     }
     
     // draws the player
     void draw_with_rgb(Color color) {
+      //Ensure x, y are within the bounds of the matrix
+      //"Since the screen is 32 LEDs wide by 16 LEDs high, this function requires 
+      //0 <= x < 32 and 0 <= y < 16. If COLOR is black (ie. r == g == b == 0), then the LED is turned off."
+      //FIX ME!!!
+      if ((x > 0 && x < 32) && (y > 0 && y < 16)) {
+        //draw the 3 bottom
+        matrix.drawPixel(x - 1, y, color.to_333());
+        matrix.drawPixel(x, y, color.to_333());
+        matrix.drawPixel(x + 1, y, color.to_333());
+        //draw the 1 top
+        matrix.drawPixel(x, y - 1, color.to_333());
+      }
     }
 };
 
