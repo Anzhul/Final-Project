@@ -68,7 +68,7 @@ class Invader {
     // Constructors
     Invader() {
       x = 0;
-      y = 0;
+      y = -4;
       strength = 0;
     }
     // sets values for private date members x and y
@@ -103,7 +103,10 @@ class Invader {
     // Moves the Invader down the screen by one row
     // Modifies: y
     void move() {
-      
+      //Each time it's called in the loop this moves to invader down one pixel.
+      if (y<32){
+        y += 1;
+      }
     }
     
     // draws the Invader if its strength is greater than 0
@@ -113,13 +116,19 @@ class Invader {
         draw_with_rgb(GREEN,RED);
       }
       if(strength == 1){
-        draw_with_rgb(GREEN,RED);
+        draw_with_rgb(RED,BLUE);
       }
     }
     
     // draws black where the Invader used to be
     // calls: draw_with_rgb
     void erase() {
+      matrix.drawPixel(x, y, BLACK.to_333());
+      matrix.drawPixel(x+3, y, BLACK.to_333());
+      matrix.drawPixel(x, y-1, BLACK.to_333());
+      matrix.drawPixel(x+1, y-1, BLACK.to_333());
+      matrix.drawPixel(x+2, y-1, BLACK.to_333());
+      matrix.drawPixel(x+3, y-1, BLACK.to_333());
     }    
     
     // Invader is hit by a Cannonball.
@@ -140,6 +149,8 @@ class Invader {
     
     // draws the Invader
     void draw_with_rgb(Color body_color, Color eye_color) {
+      //Each of these specifies a specific point on the grid. 
+      //The origin (x,y) is the upper left corner of the invader.
       matrix.drawPixel(x+1, y, body_color.to_333());
       matrix.drawPixel(x+2, y, body_color.to_333());
       matrix.drawPixel(x, y+1, body_color.to_333());
@@ -304,12 +315,22 @@ class Game {
     // sets up a new game of Space Invaders
     // Modifies: global variable matrix
     void setupGame() {
+      //Testing the invaders, iterates through and creates the aliens
+        for (int i=0; i<(32/4); i++){
+          enemies[i]= Invader(i*4, -4,i%2);
+        }
     }
     
     // advances the game simulation one step and renders the graphics
     // see spec for details of game
     // Modifies: global variable matrix
     void update(int potentiometer_value, bool button_pressed) {
+      //Testing the invaders, iterates through and moves/draws/erases all the aliens every cycle
+        for (int i=0; i<(32/4); i++){
+          enemies[i].erase();
+          enemies[i].draw();
+          enemies[i].move();
+        }
     }
 
   private:
@@ -336,6 +357,7 @@ void setup() {
   Serial.begin(9600);
   pinMode(BUTTON_PIN_NUMBER, INPUT);
   matrix.begin();
+  game.setupGame();
 }
 
 // see https://www.arduino.cc/reference/en/language/structure/sketch/loop/
@@ -343,8 +365,8 @@ void loop() {
   int potentiometer_value = analogRead(POTENTIOMETER_PIN_NUMBER);
   bool button_pressed = (digitalRead(BUTTON_PIN_NUMBER) == HIGH);
   game.update(potentiometer_value, button_pressed);
-  Invader c; 
-  c.draw();
+  //Serial.println(c.get_y());
+  delay(1000);
   //print_level(3);
   //print_lives(8);
   //game_over();
@@ -355,6 +377,7 @@ void print_level(int level) {
     matrix.setTextSize(1);
     matrix.setTextColor(WHITE.to_333());
     matrix.setCursor(0, 0);  // Set the starting position
+    //Adafruit already has library built in that outmatically outputs text
     matrix.print("Level:" );
     matrix.print(level);
 }
