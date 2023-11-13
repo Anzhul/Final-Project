@@ -17,6 +17,10 @@ const uint8_t C = A2;
 const uint8_t MAT_WIDTH = 32;
 const uint8_t MAT_HEIGHT = 16;
 
+// Size of instances
+const uint8_t INVADER_HEIGHT = 4;
+const uint8_t INVADER_WIDTH = 4;
+
 // define the wiring of the inputs
 const int POTENTIOMETER_PIN_NUMBER = 5;
 const int BUTTON_PIN_NUMBER = 10;
@@ -106,7 +110,7 @@ class Invader {
     void move() {
       // Each time it's called in the loop this moves to invader down one pixel
       // The value of y is [0, 15]. MAT_HEIGHT = 16.
-      if (y < MAT_HEIGHT){
+      if (y < MAT_HEIGHT) {
         // Previous condition for y is y < 32, why?
         y++;
       }
@@ -115,35 +119,60 @@ class Invader {
     // draws the Invader if its strength is greater than 0
     // calls: draw_with_rgb
     void draw() {
-      if(strength == 0){
-        draw_with_rgb(GREEN,RED);
+      // What's this? Why could strength be 0??
+      if (strength == 0) {
+        draw_with_rgb(GREEN, RED);
       }
-      if(strength == 1){
-        draw_with_rgb(RED,BLUE);
+      if (strength == 1) {
+        draw_with_rgb(RED, BLUE);
+        return;
+      }
+      if (strength == 2) {
+        draw_with_rgb(ORANGE, BLUE);
+        return;
+      }
+      if (strength == 3) {
+        draw_with_rgb(YELLOW, BLUE);
+        return;
+      }
+      if (strength == 4) {
+        draw_with_rgb(GREEN, BLUE);
+        return;
+      }
+      if (strength == 5) {
+        draw_with_rgb(BLUE, BLUE);
+        return;
+      }
+      if (strength == 6) {
+        draw_with_rgb(PURPLE, BLUE);
+        return;
+      }
+      if (strength == 7) {
+        draw_with_rgb(WHITE, BLUE);
+        return;
       }
     }
     
     // draws black where the Invader used to be
     // calls: draw_with_rgb
     void erase() {
-      matrix.drawPixel(x, y, BLACK.to_333());
-      matrix.drawPixel(x+3, y, BLACK.to_333());
-      matrix.drawPixel(x, y-1, BLACK.to_333());
-      matrix.drawPixel(x+1, y-1, BLACK.to_333());
-      matrix.drawPixel(x+2, y-1, BLACK.to_333());
-      matrix.drawPixel(x+3, y-1, BLACK.to_333());
+      // Have to use draw_with_rgb here.
+      draw_with_rgb(BLACK, BLACK);
     }    
     
     // Invader is hit by a Cannonball.
     // Modifies: strength
     // calls: draw, erase
     void hit() {
-      strength -= 1;
+      strength--;
       // Previous condition for strength is strength < 0
-      if (strength <= 0){
+      if (strength <= 0) {
         erase();
       }
-
+      // Have to use draw here.
+      else {
+        draw();
+      }
     }
 
   private:
@@ -337,16 +366,19 @@ class Player {
 class Game {
   public:
     Game() {
-      level = 0;
+      // Level should start from 1.
+      level = 1;
       time = 0;
     }
     
     // sets up a new game of Space Invaders
     // Modifies: global variable matrix
     void setupGame() {
-      // Testing the invaders, iterates through and creates the Invaders
+      // Testing the Invaders, iterates through and creates the Invaders
         // MAT_WIDTH = 32
+        // What do all these magic numbers mean?
         for (int i = 0; i < (MAT_WIDTH / 4); i++){
+          // What is i % 2?
           enemies[i]= Invader(i * 4, -4, i % 2);
         }
     }
@@ -355,7 +387,7 @@ class Game {
     // see spec for details of game
     // Modifies: global variable matrix
     void update(int potentiometer_value, bool button_pressed) {
-      //Testing the invaders, iterates through and moves/draws/erases all the aliens every cycle
+      //Testing the invaders, iterates through and moves/draws/erases all the Invaders every cycle
         // MAT_WIDTH = 32
         for (int i = 0; i < (MAT_WIDTH / 4); i++){
           enemies[i].erase();
@@ -373,10 +405,12 @@ class Game {
 
     // check if Player defeated all Invaders in current level
     bool level_cleared() {
+
     }
 
     // set up a level
     void reset_level() {
+      
     }
 };
 
