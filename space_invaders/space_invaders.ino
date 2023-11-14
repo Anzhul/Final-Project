@@ -13,13 +13,19 @@ const uint8_t B = A1;
 const uint8_t C = A2;
 
 // Matrix Dimensions
-// Added by xiaoym
 const uint8_t MAT_WIDTH = 32;
 const uint8_t MAT_HEIGHT = 16;
 
 // Size of instances
 const uint8_t INVADER_HEIGHT = 4;
 const uint8_t INVADER_WIDTH = 4;
+
+// Invader strength array
+const int strengths[MAX_LEVEL][MAX_INVADERS] = {{1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0},
+                                                {1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2},
+                                                {1,2,3,4,5,1,2,3,4,5,1,2,3,4,5,1},
+                                                {5,4,5,4,5,4,5,4,2,3,2,3,2,3,2,3}
+                                               };
 
 // define the wiring of the inputs
 const int POTENTIOMETER_PIN_NUMBER = 5;
