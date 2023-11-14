@@ -176,18 +176,6 @@ class Invader {
       }
     }
 
-    // Setters
-    void set_pos(int x_arg, int y_arg) {
-      x = x_arg;
-      y = y_arg;
-      return;
-    }
-
-    void set_strength(int strength_arg) {
-      strength = strength_arg;
-      return;
-    }
-
   private:
     int x;
     int y;
@@ -395,10 +383,10 @@ class Game {
       int invader_y = 0;
       for (int i = 0; i < NUM_ENEMIES; i++) {          
         if (level >= 1 && level <= 4) {
-          strength = strengths[level - 1][i];
+          invader_strength = strengths[level - 1][i];
         }
         else {
-          strength = random(1, (NUM_ENEMIES / 2));
+          invader_strength = random(1, (NUM_ENEMIES / 2));
         }
 
         invader_x = i % (NUM_ENEMIES / 2);
@@ -408,8 +396,7 @@ class Game {
           invader_y = INVADER_HEIGHT;
         }
 
-        enemies[i].set_strength(invader_strength);
-        enemies[i].set_pos(invader_x, invader_y);
+        enemies[i].initialize(invader_x, invader_y, invader_strength);
       }
 
       // Print game level and lives of Player
