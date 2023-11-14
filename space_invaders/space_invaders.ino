@@ -72,8 +72,7 @@ class Invader {
     // Constructors
     Invader() {
       x = 0;
-      // Why is the default value for y = -4?
-      y = -4;
+      y = 0;
       strength = 0;
     }
     // sets values for private date members x and y
@@ -107,56 +106,51 @@ class Invader {
 
     // Moves the Invader down the screen by one row
     // Modifies: y
+    // Added erase() and draw() inside move() to improve efficiency
     void move() {
       // Each time it's called in the loop this moves to invader down one pixel
-      // The value of y is [0, 15]. MAT_HEIGHT = 16.
-      if (y < MAT_HEIGHT) {
-        // Previous condition for y is y < 32, why?
+      // The max value for y is MAT_HEIGHT - INVADER_HEIGHT = 12. 
+      if ((y < (MAT_HEIGHT - INVADER_HEIGHT)) && (strenth > 0)) {
+        erase();
         y++;
+        draw();
       }
     }
     
     // draws the Invader if its strength is greater than 0
     // calls: draw_with_rgb
+    // Modified to switch-case to improve efficiency
     void draw() {
-      // What's this? Why could strength be 0??
-      if (strength == 0) {
-        draw_with_rgb(GREEN, RED);
-      }
-      if (strength == 1) {
-        draw_with_rgb(RED, BLUE);
-        return;
-      }
-      if (strength == 2) {
-        draw_with_rgb(ORANGE, BLUE);
-        return;
-      }
-      if (strength == 3) {
-        draw_with_rgb(YELLOW, BLUE);
-        return;
-      }
-      if (strength == 4) {
-        draw_with_rgb(GREEN, BLUE);
-        return;
-      }
-      if (strength == 5) {
-        draw_with_rgb(BLUE, BLUE);
-        return;
-      }
-      if (strength == 6) {
-        draw_with_rgb(PURPLE, BLUE);
-        return;
-      }
-      if (strength == 7) {
-        draw_with_rgb(WHITE, BLUE);
-        return;
+      switch(strength){
+        case 1:
+          draw_with_rgb(RED, BLUE);
+          break;
+        case 2:
+          draw_with_rgb(ORANGE, BLUE);
+          break;
+        case 3:
+          draw_with_rgb(YELLOW, BLUE);
+          break;
+        case 4:
+          draw_with_rgb(GREEN, BLUE);
+          break;
+        case 5:
+          draw_with_rgb(BLUE, BLUE);
+          break;
+        case 6:
+          draw_with_rgb(PURPLE, BLUE);
+          break;
+        case 7:
+          draw_with_rgb(WHITE, BLUE);
+          break;
+        default:
+          break;
       }
     }
     
     // draws black where the Invader used to be
     // calls: draw_with_rgb
     void erase() {
-      // Have to use draw_with_rgb here.
       draw_with_rgb(BLACK, BLACK);
     }    
     
@@ -165,11 +159,9 @@ class Invader {
     // calls: draw, erase
     void hit() {
       strength--;
-      // Previous condition for strength is strength < 0
       if (strength <= 0) {
         erase();
       }
-      // Have to use draw here.
       else {
         draw();
       }
@@ -242,8 +234,7 @@ class Cannonball {
     
     // Moves the Cannonball and detects if it goes off the screen
     // Modifies: y, fired
-    // Member function Cannonball::draw() is called in this function
-    // i.e. the Cannonball is moved and drawn here
+    // draw() is called in this function i.e. Cannonball is moved and drawn
     void move() {
      if (fired) {
       // Erase from its original position
@@ -294,6 +285,7 @@ class Cannonball {
 class Player {
   public:
     Player() {
+      // What are the default coordinates of player?
       x = 0;
       y = 0;
       lives = 3;
@@ -325,7 +317,7 @@ class Player {
     // draws the Player
     // calls: draw_with_rgb
     void draw() {
-      //The player is always aquamarine in color.
+      // Player is always AQUA
       draw_with_rgb(AQUA);
     }
     
@@ -344,20 +336,19 @@ class Player {
     void initialize(int x_arg, int y_arg) {
       x = x_arg;
       y = y_arg;
+      // Does lives also need to be initialized here?
     }
     
     // draws the player
     void draw_with_rgb(Color color) {
-      //Ensure x, y are within the bounds of the matrix
-      //"Since the screen is 32 LEDs wide by 16 LEDs high, this function requires 
-      //0 <= x < 32 and 0 <= y < 16. If COLOR is black (ie. r == g == b == 0), then the LED is turned off."
-      //FIX ME!!!
-      if ((x > 0 && x < 32) && (y > 0 && y < 16)) {
-        //draw the 3 bottom
+      // Ensure x, y are within the bounds of the matrix
+      if ((x > 0 && x < MAT_WIDTH) && (y == MAT_HEIGHT - 1)) {
+        //draw the bottom 3
         matrix.drawPixel(x - 1, y, color.to_333());
+        // (x, y) is the middle pixel of the bottom 3
         matrix.drawPixel(x, y, color.to_333());
         matrix.drawPixel(x + 1, y, color.to_333());
-        //draw the 1 top
+        //draw the top 1
         matrix.drawPixel(x, y - 1, color.to_333());
       }
     }
@@ -432,27 +423,42 @@ void loop() {
   game.update(potentiometer_value, button_pressed);
   //Serial.println(c.get_y());
   delay(1000);
-  //print_level(3);
-  //print_lives(8);
+  //print_level();
+  //print_lives();
   //game_over();
 }
 
-// displays Level
+// display Level
 void print_level(int level) {
     matrix.setTextSize(1);
     matrix.setTextColor(WHITE.to_333());
-    matrix.setCursor(0, 0);  // Set the starting position
-    //Adafruit already has library built in that outmatically outputs text
-    matrix.print("Level:" );
+    // Set the starting position
+    matrix.setCursor(0, 0);  
+    // Adafruit already has library built in that outmatically outputs text
+    // matrix.print() can only print single character
+    matrix.print('L');
+    matrix.print('E');
+    matrix.print('V');
+    matrix.print('E');
+    matrix.print('L');
+    matrix.print(':');
+    matrix.print(' ');
     matrix.print(level);
 }
 
-// displays number of lives
+// display number of lives
 void print_lives(int lives) {
     matrix.setTextSize(1);
     matrix.setTextColor(WHITE.to_333());
-    matrix.setCursor(0, 0);  // Set the starting position
-    matrix.print("Lives:" );
+    // Set the starting position
+    matrix.setCursor(0, 0);  
+    matrix.print('L');
+    matrix.print('I');
+    matrix.print('V');
+    matrix.print('E');
+    matrix.print('S');
+    matrix.print(':');
+    matrix.print(' ');
     matrix.print(lives);
 }
 
@@ -461,6 +467,15 @@ void game_over() {
     matrix.setTextSize(1);
     matrix.setTextColor(RED.to_333());
     matrix.setCursor(0, 0);  // Set the starting position
-    matrix.print("Game Over");
+    matrix.print('G');
+    matrix.print('A');
+    matrix.print('M');
+    matrix.print('E');
+    matrix.print(' ');
+    matrix.print('O');
+    matrix.print('V');
+    matrix.print('E');
+    matrix.print('R');
+    matrix.print('!');
 }
 
