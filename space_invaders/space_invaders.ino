@@ -378,26 +378,7 @@ class Game {
       level = 1;
 
       // Initialize the position and strength of Invaders
-      int invader_strength = 0;
-      int invader_x = 0;
-      int invader_y = 0;
-      for (int i = 0; i < NUM_ENEMIES; i++) {          
-        if (level >= 1 && level <= 4) {
-          invader_strength = strengths[level - 1][i];
-        }
-        else {
-          invader_strength = random(1, (NUM_ENEMIES / 2));
-        }
-
-        invader_x = i % (NUM_ENEMIES / 2);
-        invader_y = 0;
-        if (i >= 8) { 
-          // INVADER_HEIGHT = 4
-          invader_y = INVADER_HEIGHT;
-        }
-
-        enemies[i].initialize(invader_x, invader_y, invader_strength);
-      }
+      reset_level();
 
       // Print game level and lives of Player
       print_level(level);
@@ -413,13 +394,7 @@ class Game {
     // see spec for details of game
     // Modifies: global variable matrix
     void update(int potentiometer_value, bool button_pressed) {
-      //Testing the invaders, iterates through and moves/draws/erases all the Invaders every cycle
-        // MAT_WIDTH = 32
-        for (int i = 0; i < (MAT_WIDTH / 4); i++){
-          enemies[i].erase();
-          enemies[i].draw();
-          enemies[i].move();
-        }
+      
     }
 
   private:
@@ -431,12 +406,37 @@ class Game {
 
     // check if Player defeated all Invaders in current level
     bool level_cleared() {
-
+      for (int i = 0; i < NUM_ENEMIES; i++) {
+        if (enemies[i] > 0) {
+          return false;
+        }
+        return true;
+      }
     }
 
     // set up a level
     void reset_level() {
-      
+      int invader_strength = 0;
+      int invader_x = 0;
+      int invader_y = 0;
+      for (int i = 0; i < NUM_ENEMIES; i++) {          
+        if (level >= 1 && level <= 4) {
+          invader_strength = strengths[level - 1][i];
+        }
+        else {
+          invader_strength = random(1, (NUM_ENEMIES / 2));
+        }
+
+        invader_x = i % (NUM_ENEMIES / 2);
+        invader_y = 0;
+        if (i >= (NUM_ENEMIES / 2)) { 
+          // INVADER_HEIGHT = 4
+          invader_y = INVADER_HEIGHT;
+        }
+
+        enemies[i].initialize(invader_x, invader_y, invader_strength);
+      }
+      return;
     }
 };
 
