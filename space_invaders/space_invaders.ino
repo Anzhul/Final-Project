@@ -21,11 +21,14 @@ const uint8_t INVADER_HEIGHT = 4;
 const uint8_t INVADER_WIDTH = 4;
 
 // Invader strength array
+const uint8_t MAX_LEVEL = 4;
+const uint8_t MAX_INVADERS = 16;
 const int strengths[MAX_LEVEL][MAX_INVADERS] = {{1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0},
                                                 {1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2},
                                                 {1,2,3,4,5,1,2,3,4,5,1,2,3,4,5,1},
                                                 {5,4,5,4,5,4,5,4,2,3,2,3,2,3,2,3}
                                                };
+
 
 // define the wiring of the inputs
 const int POTENTIOMETER_PIN_NUMBER = 5;
@@ -171,6 +174,18 @@ class Invader {
       else {
         draw();
       }
+    }
+
+    // Setters
+    void set_pos(int x_arg, int y_arg) {
+      x = x_arg;
+      y = y_arg;
+      return;
+    }
+
+    void set_strength(int strength_arg) {
+      strength = strength_arg;
+      return;
     }
 
   private:
@@ -371,14 +386,41 @@ class Game {
     // sets up a new game of Space Invaders
     // Modifies: global variable matrix
     void setupGame() {
-      // Testing the Invaders, iterates through and creates the Invaders
-        // MAT_WIDTH = 32
-        // What do all these magic numbers mean?
-        for (int i = 0; i < (MAT_WIDTH / 4); i++){
-          // What is i % 2?
-          enemies[i]= Invader(i * 4, -4, i % 2);
+      // Initialize the game level
+      level = 1;
+
+      // Initialize the position and strength of Invaders
+      int invader_strength = 0;
+      int invader_x = 0;
+      int invader_y = 0;
+      for (int i = 0; i < NUM_ENEMIES; i++) {          
+        if (level >= 1 && level <= 4) {
+          strength = strengths[level - 1][i];
         }
+        else {
+          strength = random(1, (NUM_ENEMIES / 2));
+        }
+
+        invader_x = i % (NUM_ENEMIES / 2);
+        invader_y = 0;
+        if (i >= 8) { 
+          // INVADER_HEIGHT = 4
+          invader_y = INVADER_HEIGHT;
+        }
+
+        enemies[i].set_strength(invader_strength);
+        enemies[i].set_pos(invader_x, invader_y);
+      }
+
+      // Print game level and lives of Player
+      print_level(level);
+      delay(2000);
+      print_lives(player.get_lives());
+      delay(2000);
+      // Refresh the screen
+      matrix.fillScreen(BLACK.to_333());
     }
+
     
     // advances the game simulation one step and renders the graphics
     // see spec for details of game
@@ -436,52 +478,58 @@ void loop() {
 
 // display Level
 void print_level(int level) {
-    matrix.setTextSize(1);
-    matrix.setTextColor(WHITE.to_333());
-    // Set the starting position
-    matrix.setCursor(0, 0);  
-    // Adafruit already has library built in that outmatically outputs text
-    // matrix.print() can only print single character
-    matrix.print('L');
-    matrix.print('E');
-    matrix.print('V');
-    matrix.print('E');
-    matrix.print('L');
-    matrix.print(':');
-    matrix.print(' ');
-    matrix.print(level);
+  // Refresh the screen
+  matrix.fillScreen(BLACK.to_333());
+  matrix.setTextSize(1);
+  matrix.setTextColor(WHITE.to_333());
+  // Set the starting position
+  matrix.setCursor(0, 0);  
+  // Adafruit already has library built in that outmatically outputs text
+  // matrix.print() can only print single character
+  matrix.print('L');
+  matrix.print('E');
+  matrix.print('V');
+  matrix.print('E');
+  matrix.print('L');
+  matrix.print(':');
+  matrix.print(' ');
+  matrix.print(level);
 }
 
 // display number of lives
 void print_lives(int lives) {
-    matrix.setTextSize(1);
-    matrix.setTextColor(WHITE.to_333());
-    // Set the starting position
-    matrix.setCursor(0, 0);  
-    matrix.print('L');
-    matrix.print('I');
-    matrix.print('V');
-    matrix.print('E');
-    matrix.print('S');
-    matrix.print(':');
-    matrix.print(' ');
-    matrix.print(lives);
+  // Refresh the screen
+  matrix.fillScreen(BLACK.to_333());
+  matrix.setTextSize(1);
+  matrix.setTextColor(WHITE.to_333());
+  // Set the starting position
+  matrix.setCursor(0, 0);  
+  matrix.print('L');
+  matrix.print('I');
+  matrix.print('V');
+  matrix.print('E');
+  matrix.print('S');
+  matrix.print(':');
+  matrix.print(' ');
+  matrix.print(lives);
 }
 
 // displays "game over"
 void game_over() {
-    matrix.setTextSize(1);
-    matrix.setTextColor(RED.to_333());
-    matrix.setCursor(0, 0);  // Set the starting position
-    matrix.print('G');
-    matrix.print('A');
-    matrix.print('M');
-    matrix.print('E');
-    matrix.print(' ');
-    matrix.print('O');
-    matrix.print('V');
-    matrix.print('E');
-    matrix.print('R');
-    matrix.print('!');
+  // Refresh the screen
+  matrix.fillScreen(BLACK.to_333());
+  matrix.setTextSize(1);
+  matrix.setTextColor(RED.to_333());
+  matrix.setCursor(0, 0); 
+  matrix.print('G');
+  matrix.print('A');
+  matrix.print('M');
+  matrix.print('E');
+  matrix.print(' ');
+  matrix.print('O');
+  matrix.print('V');
+  matrix.print('E');
+  matrix.print('R');
+  matrix.print('!');
 }
 
