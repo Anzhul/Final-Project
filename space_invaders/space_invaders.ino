@@ -295,8 +295,8 @@ class Player {
   public:
     Player() {
       // What are the default coordinates of player?
-      x = 0;
-      y = 0;
+      x = (MAT_WIDTH / 2) - 1;
+      y = MAT_HEIGHT - 1;
       lives = 3;
     }
     
@@ -380,6 +380,8 @@ class Game {
       // Initialize the position and strength of Invaders
       reset_level();
 
+      // TODO: Initialze the position of Player?
+
       // Print game level and lives of Player
       print_level(level);
       delay(2000);
@@ -394,7 +396,39 @@ class Game {
     // see spec for details of game
     // Modifies: global variable matrix
     void update(int potentiometer_value, bool button_pressed) {
-      
+      // FIXME: Game over
+      if (player.get_lives() <= 0) {
+        game_over();
+        delay(2000);
+        return;
+      }
+
+      // Update position of Player based on the value of the potentiometer
+      player.erase();
+      player.set_x(((MAT_WIDTH) * potentiometer_value) / 1024);
+      player.draw();
+
+      // Update position of Cannonball,
+      // Detect if a new cannonball is being fired
+      if (button_pressed && !ball.has_been_fired()) {
+        ball.fire(player.get_x(), 14);
+      }
+      ball.move();
+
+      // Update Invaders
+      // TODO: Implement this
+      // "The bottom row should move at first (top row does not).
+      // "Make sure that the bottom row does not move immediately after the game/level starts.
+      // "They should move down after your set time increment once the game/level starts.
+      // "The top row of invaders should start moving down once the entire bottom row is cleared.""
+      for (int i = 0; i < NUM_ENEMIES; i++) {
+        if (enemies[i].get_strength() <= 0) {
+          enemies.erase();
+        }
+        else {
+          enemies.draw();
+        }
+      }
     }
 
   private:
