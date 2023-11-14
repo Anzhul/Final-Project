@@ -119,13 +119,13 @@ class Invader {
     void move() {
       // Each time it's called in the loop this moves to invader down one pixel
       // The max value for y is MAT_HEIGHT - INVADER_HEIGHT = 12. 
-      if ((y < (MAT_HEIGHT - INVADER_HEIGHT)) && (strenth > 0)) {
+      if ((y < (MAT_HEIGHT - INVADER_HEIGHT + 4)) && (strength > 0)) {
         erase();
         y++;
         draw();
+
       }
     }
-    
     // draws the Invader if its strength is greater than 0
     // calls: draw_with_rgb
     // Modified to switch-case to improve efficiency
@@ -423,12 +423,37 @@ class Game {
       // "The top row of invaders should start moving down once the entire bottom row is cleared.""
       for (int i = 0; i < NUM_ENEMIES; i++) {
         if (enemies[i].get_strength() <= 0) {
-          enemies.erase();
+          enemies[i].erase();
         }
         else {
-          enemies.draw();
+          enemies[i].draw();
+          //Moves the invaders at a 1/10th the time of the game
+          if ((time % 10) == 0){
+            enemies[i].move();
+          }
         }
       }
+
+      for (int i = 0; i < NUM_ENEMIES; i++){
+        /*      matrix.drawPixel(x + 2, y + 2, body_color.to_333());
+      matrix.drawPixel(x + 3, y + 2, body_color.to_333());
+      matrix.drawPixel(x, y + 3, body_color.to_333());
+      matrix.drawPixel(x + 3, y + 3, body_color.to_333());
+      */
+      int x = enemies[i].get_x();
+      int y = enemies[i].get_y();
+
+      //HIT DETECTION! Please do not change, 
+        if((ball.get_x() == x+2 && ball.get_y() == y+2) ||
+          (ball.get_x() == x+3 && ball.get_y() == y+2) ||
+          (ball.get_x() == x && ball.get_y() == y+3) ||
+          (ball.get_x() == x+3 && ball.get_y() == y+3)){
+          enemies[i].hit();
+          ball.hit();
+        }
+      }
+
+      time++;
     }
 
   private:
@@ -441,7 +466,7 @@ class Game {
     // check if Player defeated all Invaders in current level
     bool level_cleared() {
       for (int i = 0; i < NUM_ENEMIES; i++) {
-        if (enemies[i] > 0) {
+        if (enemies > 0) {
           return false;
         }
         return true;
@@ -461,13 +486,13 @@ class Game {
           invader_strength = random(1, (NUM_ENEMIES / 2));
         }
 
-        invader_x = i % (NUM_ENEMIES / 2);
+        //invader_x = i % (NUM_ENEMIES / 2);
+        invader_x = i * 4;
         invader_y = 0;
         if (i >= (NUM_ENEMIES / 2)) { 
           // INVADER_HEIGHT = 4
           invader_y = INVADER_HEIGHT;
         }
-
         enemies[i].initialize(invader_x, invader_y, invader_strength);
       }
       return;
@@ -490,11 +515,7 @@ void loop() {
   int potentiometer_value = analogRead(POTENTIOMETER_PIN_NUMBER);
   bool button_pressed = (digitalRead(BUTTON_PIN_NUMBER) == HIGH);
   game.update(potentiometer_value, button_pressed);
-  //Serial.println(c.get_y());
-  delay(1000);
-  //print_level();
-  //print_lives();
-  //game_over();
+  delay(50);
 }
 
 // display Level
@@ -507,6 +528,7 @@ void print_level(int level) {
   matrix.setCursor(0, 0);  
   // Adafruit already has library built in that outmatically outputs text
   // matrix.print() can only print single character
+  //matrix.print()
   matrix.print('L');
   matrix.print('E');
   matrix.print('V');
