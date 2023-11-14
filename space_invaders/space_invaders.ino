@@ -415,6 +415,27 @@ class Game {
       }
       ball.move();
 
+      // Hit detection
+      for (int i = 0; i < NUM_ENEMIES; i++){
+        /* x + 2, y + 2
+           x + 3, y + 2
+           x, y + 3
+           x + 3, y + 3, body_color.to_333());
+        */
+      int x = enemies[i].get_x();
+      int y = enemies[i].get_y();
+ 
+      if (enemies[i].get_strength() > 0) {
+        if((ball.get_x() == x + 1 && ball.get_y() == y + 2) ||
+          (ball.get_x() == x + 2 && ball.get_y() == y + 2) ||
+          (ball.get_x() == x && ball.get_y() == y + 3) ||
+          (ball.get_x() == x + 3 && ball.get_y() == y + 3)){
+          enemies[i].hit();
+          ball.hit();
+        }
+      }
+      }
+
       // Update Invaders
       // TODO: Implement this
       // "The bottom row should move at first (top row does not).
@@ -434,26 +455,7 @@ class Game {
         }
       }
 
-      for (int i = 0; i < NUM_ENEMIES; i++){
-        /* x + 2, y + 2
-      x + 3, y + 2
-      x, y + 3
-      x + 3, y + 3, body_color.to_333());
-      */
-      int x = enemies[i].get_x();
-      int y = enemies[i].get_y();
-
-    //HIT DETECTION! Please do not change, 
-      if (enemies[i].get_strength() > 0) {
-        if((ball.get_x() == x+1 && ball.get_y() == y+2) ||
-          (ball.get_x() == x+2 && ball.get_y() == y+2) ||
-          (ball.get_x() == x && ball.get_y() == y+3) ||
-          (ball.get_x() == x+3 && ball.get_y() == y+3)){
-          enemies[i].hit();
-          ball.hit();
-        }
-      }
-      }
+      
       time++;
     }
 
