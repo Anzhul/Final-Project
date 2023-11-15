@@ -127,14 +127,13 @@ class Invader {
         erase();
         y++;
         draw();
-
       }
     }
     // draws the Invader if its strength is greater than 0
     // calls: draw_with_rgb
     // Modified to switch-case to improve efficiency
     void draw() {
-      switch(strength){
+      switch (strength) {
         case 1:
           draw_with_rgb(RED, BLUE);
           break;
@@ -381,7 +380,7 @@ class Game {
       level = 1;
 
       // Initialize the position of Player
-      player.initialize((MAT_WIDTH / 2) - 1, MAT_HEIGHT - 1);
+      player.set_x((MAT_WIDTH / 2) - 1);
 
       // Initialize the position and strength of Invaders
       reset_level();
@@ -423,7 +422,7 @@ class Game {
  
         if (enemies[i].get_strength() > 0) {
           // Invader touches the bottom
-          if (y + INVADER_HEIGHT == MAX_HEIGHT) {
+          if (y + INVADER_HEIGHT == MAT_HEIGHT) {
             touch_bottom = true;
             // Invader should be erased and cleared after touching bottom
             enemies[i].erase();
