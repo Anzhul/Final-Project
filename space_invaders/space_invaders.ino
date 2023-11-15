@@ -119,7 +119,7 @@ class Invader {
     void move() {
       // Each time it's called in the loop this moves to invader down one pixel
       // The max value for y is MAT_HEIGHT - INVADER_HEIGHT = 12. 
-      if ((y < (MAT_HEIGHT - INVADER_HEIGHT + 4)) && (strength > 0)) {
+      if ((y < (MAT_HEIGHT - INVADER_HEIGHT) && (strength > 0)) {
         erase();
         y++;
         draw();
@@ -379,16 +379,6 @@ class Game {
 
       // Initialize the position and strength of Invaders
       reset_level();
-
-      // TODO: Initialze the position of Player?
-
-      // Print game level and lives of Player
-      print_level(level);
-      delay(2000);
-      print_lives(player.get_lives());
-      delay(2000);
-      // Refresh the screen
-      matrix.fillScreen(BLACK.to_333());
     }
 
     
@@ -415,7 +405,7 @@ class Game {
       }
       ball.move();
 
-      // Hit detection
+      // Touch detection
       for (int i = 0; i < NUM_ENEMIES; i++){
         /* x + 2, y + 2
            x + 3, y + 2
@@ -425,15 +415,32 @@ class Game {
       int x = enemies[i].get_x();
       int y = enemies[i].get_y();
  
-      if (enemies[i].get_strength() > 0) {
-        if((ball.get_x() == x + 1 && ball.get_y() == y + 2) ||
-          (ball.get_x() == x + 2 && ball.get_y() == y + 2) ||
-          (ball.get_x() == x && ball.get_y() == y + 3) ||
-          (ball.get_x() == x + 3 && ball.get_y() == y + 3)){
-          enemies[i].hit();
-          ball.hit();
+        if (enemies[i].get_strength() > 0) {
+          // Invader touches the bottom
+          if (y + INVADER_HEIGHT == MAX_HEIGHT) {
+            touch_bottom = true;
+            enemies[i].erase();
+          }
+          
+          // Invader touches Player
+          if (invader_touch_player(enemies[i], player)) {
+            touch_player = true;
+          };
+
+          // Invader hit by Cannonball
+          if ((ball.get_x() == x + 1 && ball.get_y() == y + 2) ||
+             (ball.get_x() == x + 2 && ball.get_y() == y + 2)  ||
+             (ball.get_x() == x && ball.get_y() == y + 3) ||
+             (ball.get_x() == x + 3 && ball.get_y() == y + 3)) {
+              enemies[i].hit();
+              ball.hit();
+          }
         }
       }
+
+      // Player loses one life if any Invader touches bottom or touches Player in one loop
+      if (touch_bottom || touch_player) {
+        player.die();
       }
 
       // Update Invaders
@@ -448,11 +455,17 @@ class Game {
         }
         else {
           enemies[i].draw();
-          //Moves the invaders at a 1/10th the time of the game
+          // Moves the invaders at a 1/10th the time of the game
           if ((time % 10) == 0){
             enemies[i].move();
           }
         }
+      }
+
+      // Next level
+      if (level_cleared()) {
+        level++;
+        reset_level();
       }
 
       
@@ -465,11 +478,36 @@ class Game {
     Player player;
     Cannonball ball;
     Invader enemies[NUM_ENEMIES];
+    // Check if any Invader touches bottom *in one loop*
+    bool touch_bottom = false;
+    // Check if any Invader touches Player *in one loop*
+    bool touch_player = false;
 
-    // check if Player defeated all Invaders in current level
+    // Check if Invader touch the Player
+    bool invader_touch_player(Invader invader, Player player) {
+      // Coordinates of bottom pixels of Invader
+      int invader_x[4] = {invader.get_x(), invader.get_x() + 1, invader.get_x() + 2, invader.get_x() + 3};
+      int invader_y[4] = {invader.get_y() + 3, invader.get_y() + 2, invader.get_y() + 2, invader.get_y() + 3};
+      // Coordinates of top pixels of Player
+      int player_x[3] = {player.get_x() - 1, player.get_x(), player.get_x() + 1};
+      int player_y[3] = {player.get_y(), player.get_y() - 1, player.get_y()};
+
+      // Iterate through all the coordinates of possible touches
+      for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 3; j++) {
+          if ((invader_x[i] == player_x[j]) && (invader_y[i] == player_y[j])) {
+            return true;
+          }
+        }
+      }
+      // No touch detected
+      return false;
+    }
+
+    // Check if Player defeated all Invaders in current level
     bool level_cleared() {
       for (int i = 0; i < NUM_ENEMIES; i++) {
-        if (enemies > 0) {
+        if (enemies[i].get_strength() > 0) {
           return false;
         }
         return true;
@@ -489,8 +527,7 @@ class Game {
           invader_strength = random(1, (NUM_ENEMIES / 2));
         }
 
-        //invader_x = i % (NUM_ENEMIES / 2);
-        invader_x = i * 4;
+        invader_x = (i % (NUM_ENEMIES / 2)) * 4;
         invader_y = 0;
         if (i >= (NUM_ENEMIES / 2)) { 
           // INVADER_HEIGHT = 4
@@ -498,6 +535,15 @@ class Game {
         }
         enemies[i].initialize(invader_x, invader_y, invader_strength);
       }
+
+      // Print game level and lives of Player
+      print_level(level);
+      delay(2000);
+      print_lives(player.get_lives());
+      delay(2000);
+      // Refresh the screen
+      matrix.fillScreen(BLACK.to_333());
+
       return;
     }
 };
