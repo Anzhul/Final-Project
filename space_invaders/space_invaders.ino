@@ -349,7 +349,6 @@ class Player {
     void initialize(int x_arg, int y_arg) {
       x = x_arg;
       y = y_arg;
-      // Does lives also need to be initialized here?
     }
     
     // draws the player
@@ -380,6 +379,9 @@ class Game {
     void setupGame() {
       // Initialize the game level
       level = 1;
+
+      // Initialize the position of Player
+      player.initialize((MAT_WIDTH / 2) - 1, MAT_HEIGHT - 1);
 
       // Initialize the position and strength of Invaders
       reset_level();
@@ -453,20 +455,21 @@ class Game {
       }
 
       // Update Invaders
-      // TODO: Implement this
-      // "The bottom row should move at first (top row does not).
-      // "Make sure that the bottom row does not move immediately after the game/level starts.
-      // "They should move down after your set time increment once the game/level starts.
-      // "The top row of invaders should start moving down once the entire bottom row is cleared.""
       for (int i = 0; i < NUM_ENEMIES; i++) {
         if (enemies[i].get_strength() <= 0) {
           enemies[i].erase();
         }
         else {
           enemies[i].draw();
-          // Moves the invaders at a 1/10th the time of the game
-          if ((time % 10) == 0){
-            enemies[i].move();
+          // *level == 1*: There is only 1 row of Invaders in level 1
+          // *i >= (NUM_ENEMIES / 2)*: The second row should move at first
+          // *second_row_cleared()*: The first row moves after second row is cleared.
+          if ((level == 1) || (i >= (NUM_ENEMIES / 2)) || (second_row_cleared())) {
+            // Move the Invaders at every 1/10 of the game time
+            // There should be an initial delay before the first Invader moves
+            if ((time % 10) == 0){
+              enemies[i].move();
+            } 
           }
         }
       }
@@ -513,6 +516,16 @@ class Game {
       return false;
     }
 
+    // Check if Player defeated all Invaders in the second row 
+    bool second_row_cleared() {
+      for (int i = (NUM_ENEMIES / 2); i < NUM_ENEMIES; i++) {
+        if (enemies[i].get_strength() > 0) {
+          return false;
+        }
+        return true;
+      }
+    }
+
     // Check if Player defeated all Invaders in current level
     bool level_cleared() {
       for (int i = 0; i < NUM_ENEMIES; i++) {
@@ -552,7 +565,6 @@ class Game {
       delay(2000);
       // Refresh the screen
       matrix.fillScreen(BLACK.to_333());
-
       return;
     }
 };
