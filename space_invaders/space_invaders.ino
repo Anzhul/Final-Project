@@ -123,7 +123,7 @@ class Invader {
     void move() {
       // Each time it's called in the loop this moves to invader down one pixel
       // The max value for y is MAT_HEIGHT - INVADER_HEIGHT = 12. 
-      if ((y < (MAT_HEIGHT - INVADER_HEIGHT) && (strength > 0)) {
+      if (y < (MAT_HEIGHT - INVADER_HEIGHT) && (strength > 0)) {
         erase();
         y++;
         draw();
