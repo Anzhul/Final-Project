@@ -101,6 +101,10 @@ class Invader {
       y = y_arg;
       strength = strength_arg;
     }
+    // Sets values for strength
+    void set_strength(int strength_arg) {
+      strength = strength_arg;
+    }
     
     // getters
     int get_x() const {
@@ -419,12 +423,17 @@ class Game {
           // Invader touches the bottom
           if (y + INVADER_HEIGHT == MAX_HEIGHT) {
             touch_bottom = true;
+            // Invader should be erased and cleared after touching bottom
             enemies[i].erase();
+            enemies[i].set_strength(0);
           }
           
           // Invader touches Player
           if (invader_touch_player(enemies[i], player)) {
             touch_player = true;
+            // Invader should be erased and cleared after touching Player
+            enemies[i].erase();
+            enemies[i].set_strength(0);
           };
 
           // Invader hit by Cannonball
