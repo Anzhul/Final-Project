@@ -332,6 +332,13 @@ class Player {
       // Player is always AQUA
       draw_with_rgb(AQUA);
     }
+
+    //Resets the Player position and lives
+    void reset(){
+      x = (MAT_WIDTH / 2) - 1;
+      y = MAT_HEIGHT - 1;
+      lives = 3;
+    }
     
     // draws black where the Player used to be
     // calls: draw_with_rgb
@@ -393,14 +400,18 @@ class Game {
     void update(int potentiometer_value, bool button_pressed) {
       // FIXME: Game over
       if (player.get_lives() <= 0) {
+        //Print game over
         game_over();
-        delay(2000);
-        return;
+        //Wait 3 seconds
+        delay(3000);
+        //Restart the game
+        restart_game();
       }
 
       // Update position of Player based on the value of the potentiometer
       player.erase();
       player.set_x(((MAT_WIDTH) * potentiometer_value) / 1024);
+      Serial.print(player.get_x());
       player.draw();
 
       // Update position of Cannonball,
@@ -479,7 +490,7 @@ class Game {
         reset_level();
       }
 
-      
+    
       time++;
     }
 
@@ -566,7 +577,19 @@ class Game {
       matrix.fillScreen(BLACK.to_333());
       return;
     }
-};
+
+  //Restart the game
+    void restart_game(){
+      //Set level back to 1
+      level = 1;
+      //Reset time
+      time = 0;
+      //Reset player position and lives
+      player.reset();
+      //Reset level 
+      reset_level();
+    }
+  };
 
 // a global variable that represents the game Space Invaders
 Game game;
@@ -644,4 +667,3 @@ void game_over() {
   matrix.print('R');
   matrix.print('!');
 }
-
