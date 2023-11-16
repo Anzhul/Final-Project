@@ -481,7 +481,9 @@ class Game {
           if ((level == 1) || (i >= (NUM_ENEMIES / 2)) || (second_row_cleared())) {
             // Move the Invaders at every 1/10 of the game time
             // Initial delay until the time is larger 30
-            if ((time % 10 == 0) && (time > 30)){
+            // Need to be fixed
+            // Timing should be recording time rather than Number of runs
+            if ((time % 20 == 0) && (time > 60)){
               enemies[i].move();
             } 
           }
@@ -551,6 +553,9 @@ class Game {
 
     // set up a level
     void reset_level() {
+      // Need to be fixed
+      time = 0;
+      
       int invader_strength = 0;
       int invader_x = 0;
       int invader_y = 0;
