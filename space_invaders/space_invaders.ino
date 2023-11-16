@@ -471,6 +471,10 @@ class Game {
         player.die();
       }
 
+      // Reset touch_bottom and touch_player
+      touch_bottom = false;
+      touch_player = false;
+
       // Update Invaders
       for (int i = 0; i < NUM_ENEMIES; i++) {
         if (enemies[i].get_strength() <= 0) {
