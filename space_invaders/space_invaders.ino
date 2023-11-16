@@ -515,18 +515,20 @@ class Game {
 
     // Check if Invader touch the Player
     bool invader_touch_player(Invader invader, Player player) {
-      // Coordinates of bottom pixels of Invader
-      int invader_x[4] = {invader.get_x(), invader.get_x() + 1, invader.get_x() + 2, invader.get_x() + 3};
-      int invader_y[4] = {invader.get_y() + 3, invader.get_y() + 2, invader.get_y() + 2, invader.get_y() + 3};
-      // Coordinates of top pixels of Player
-      int player_x[3] = {player.get_x() - 1, player.get_x(), player.get_x() + 1};
-      int player_y[3] = {player.get_y(), player.get_y() - 1, player.get_y()};
+      if ((invader.get_strength() > 0) || (player.get_lives() > 0)) {
+        // Coordinates of bottom pixels of Invader
+        int invader_x[4] = {invader.get_x(), invader.get_x() + 1, invader.get_x() + 2, invader.get_x() + 3};
+        int invader_y[4] = {invader.get_y() + 3, invader.get_y() + 2, invader.get_y() + 2, invader.get_y() + 3};
+        // Coordinates of top pixels of Player
+        int player_x[3] = {player.get_x() - 1, player.get_x(), player.get_x() + 1};
+        int player_y[3] = {player.get_y(), player.get_y() - 1, player.get_y()};
 
-      // Iterate through all the coordinates of possible touches
-      for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 3; j++) {
-          if ((invader_x[i] == player_x[j]) && (invader_y[i] == player_y[j])) {
-            return true;
+        // Iterate through all the coordinates of possible touches
+        for (int i = 0; i < 4; i++) {
+          for (int j = 0; j < 3; j++) {
+           if ((invader_x[i] == player_x[j]) && (invader_y[i] == player_y[j])) {
+             return true;
+            }
           }
         }
       }
