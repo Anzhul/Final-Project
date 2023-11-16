@@ -44,6 +44,7 @@ RGBmatrixPanel matrix(A, B, C, CLK, LAT, OE, false);
 void print_level(int level);
 void print_lives(int lives);
 void game_over();
+void game_start();
 
 class Color {
   public:
@@ -297,7 +298,6 @@ class Cannonball {
 class Player {
   public:
     Player() {
-      // What are the default coordinates of player?
       x = (MAT_WIDTH / 2) - 1;
       y = MAT_HEIGHT - 1;
       lives = 3;
@@ -318,6 +318,10 @@ class Player {
     void set_x(int x_arg) {
       x = x_arg;
     }
+
+    void set_lives(int lives_arg) {
+      lives = lives_arg;
+    }
     
     // Modifies: lives
     void die() {
@@ -331,13 +335,6 @@ class Player {
     void draw() {
       // Player is always AQUA
       draw_with_rgb(AQUA);
-    }
-
-    //Resets the Player position and lives
-    void reset() {
-      x = (MAT_WIDTH / 2) - 1;
-      y = MAT_HEIGHT - 1;
-      lives = 3;
     }
     
     // draws black where the Player used to be
@@ -383,11 +380,18 @@ class Game {
     // sets up a new game of Space Invaders
     // Modifies: global variable matrix
     void setupGame() {
+      // Initialize time
+      time = 0;
+
       // Initialize the game level
       level = 1;
 
-      // Initialize the position of Player
+      // Initialize the position and lives of Player
       player.set_x((MAT_WIDTH / 2) - 1);
+      player.set_lives(3);
+
+      // Display "game start"
+      game_start();
 
       // Initialize the position and strength of Invaders
       reset_level();
@@ -398,14 +402,13 @@ class Game {
     // see spec for details of game
     // Modifies: global variable matrix
     void update(int potentiometer_value, bool button_pressed) {
-      // FIXME: Game over
       if (player.get_lives() <= 0) {
-        //Print game over
+        // Print game over
         game_over();
-        //Wait 3 seconds
+        // Wait 3 seconds
         delay(3000);
-        //Restart the game
-        restart_game();
+        // Restart Game
+        setupGame();
       }
 
       // Update position of Player based on the value of the potentiometer
@@ -477,14 +480,15 @@ class Game {
           if ((level == 1) || (i >= (NUM_ENEMIES / 2)) || (second_row_cleared())) {
             // Move the Invaders at every 1/10 of the game time
             // There should be an initial delay before the first Invader moves
-            // Delays the game until the time is larger 30
-            if ((time % 10 && time > 30) == 0){
+            // Delay until the time is larger 30
+            if ((time % 10 == 0) && (time > 30)){
               enemies[i].move();
             } 
           }
         }
       }
-      //Needs to be tested, but after the first loop th
+
+      // Need to be tested!
       // Next level
       if (level_cleared()) {
         level++;
@@ -576,18 +580,6 @@ class Game {
       matrix.fillScreen(BLACK.to_333());
       return;
     }
-
-  //Restart the game
-    void restart_game() {
-      //Set level back to 1
-      level = 1;
-      //Reset time
-      time = 0;
-      //Reset player position and lives
-      player.reset();
-      //Reset level 
-      reset_level();
-    }
   };
 
 // a global variable that represents the game Space Invaders
@@ -609,7 +601,7 @@ void loop() {
   delay(50);
 }
 
-// display Level
+// Display Level
 void print_level(int level) {
   // Refresh the screen
   matrix.fillScreen(BLACK.to_333());
@@ -630,7 +622,7 @@ void print_level(int level) {
   matrix.print(level);
 }
 
-// display number of lives
+// Display number of lives
 void print_lives(int lives) {
   // Refresh the screen
   matrix.fillScreen(BLACK.to_333());
@@ -648,7 +640,7 @@ void print_lives(int lives) {
   matrix.print(lives);
 }
 
-// displays "game over"
+// Display "game over"
 void game_over() {
   // Refresh the screen
   matrix.fillScreen(BLACK.to_333());
@@ -665,4 +657,23 @@ void game_over() {
   matrix.print('E');
   matrix.print('R');
   matrix.print('!');
+}
+
+// Display "game start"
+void game_start() {
+  // Refresh the screen
+  matrix.fillScreen(BLACK.to_333());
+  matrix.setTextSize(1);
+  matrix.setTextColor(GREEN.to_333());
+  matrix.setCursor(0, 0); 
+  matrix.print('G');
+  matrix.print('A');
+  matrix.print('M');
+  matrix.print('E');
+  matrix.print(' ');
+  matrix.print('S');
+  matrix.print('T');
+  matrix.print('A');
+  matrix.print('R');
+  matrix.print('T');
 }
