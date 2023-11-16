@@ -334,7 +334,7 @@ class Player {
     }
 
     //Resets the Player position and lives
-    void reset(){
+    void reset() {
       x = (MAT_WIDTH / 2) - 1;
       y = MAT_HEIGHT - 1;
       lives = 3;
@@ -477,20 +477,19 @@ class Game {
           if ((level == 1) || (i >= (NUM_ENEMIES / 2)) || (second_row_cleared())) {
             // Move the Invaders at every 1/10 of the game time
             // There should be an initial delay before the first Invader moves
-            if ((time % 10) == 0){
+            // Delays the game until the time is larger 30
+            if ((time % 10 && time > 30) == 0){
               enemies[i].move();
             } 
           }
         }
       }
-
+      //Needs to be tested, but after the first loop th
       // Next level
       if (level_cleared()) {
         level++;
         reset_level();
       }
-
-    
       time++;
     }
 
@@ -579,7 +578,7 @@ class Game {
     }
 
   //Restart the game
-    void restart_game(){
+    void restart_game() {
       //Set level back to 1
       level = 1;
       //Reset time
