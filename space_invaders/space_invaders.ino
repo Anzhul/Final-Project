@@ -556,6 +556,10 @@ class Game {
       // Need to be fixed
       time = 0;
 
+      // Initialize touch_bottom and touch_player
+      touch_bottom = false;
+      touch_player = false;
+
       int invader_strength = 0;
       int invader_x = 0;
       int invader_y = 0;
