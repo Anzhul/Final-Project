@@ -392,6 +392,7 @@ class Game {
 
       // Display "game start"
       game_start();
+      delay(3000);
 
       // Initialize the position and strength of Invaders
       reset_level();
@@ -420,7 +421,7 @@ class Game {
       // Update position of Cannonball,
       // Detect if a new cannonball is being fired
       if (button_pressed && !ball.has_been_fired()) {
-        ball.fire(player.get_x(), 14);
+        ball.fire(player.get_x(), MAT_HEIGHT - 2);
       }
       ball.move();
 
@@ -477,13 +478,9 @@ class Game {
         }
         else {
           enemies[i].draw();
-          // *level == 1*: There is only 1 row of Invaders in level 1
-          // *i >= (NUM_ENEMIES / 2)*: The second row should move at first
-          // *second_row_cleared()*: The first row moves after second row is cleared.
           if ((level == 1) || (i >= (NUM_ENEMIES / 2)) || (second_row_cleared())) {
             // Move the Invaders at every 1/10 of the game time
-            // There should be an initial delay before the first Invader moves
-            // Delay until the time is larger 30
+            // Initial delay until the time is larger 30
             if ((time % 10 == 0) && (time > 30)){
               enemies[i].move();
             } 
@@ -491,7 +488,6 @@ class Game {
         }
       }
 
-      // Need to be tested!
       // Next level
       if (level_cleared()) {
         level++;
@@ -538,19 +534,20 @@ class Game {
         if (enemies[i].get_strength() > 0) {
           return false;
         }
-        return true;
       }
+      return true;
     }
 
     // Check if Player defeated all Invaders in current level
     bool level_cleared() {
       for (int i = 0; i < NUM_ENEMIES; i++) {
         if (enemies[i].get_strength() > 0) {
-          return false;
+        return false; 
         }
-        return true;
       }
+      return true; 
     }
+
 
     // set up a level
     void reset_level() {
@@ -574,13 +571,15 @@ class Game {
         enemies[i].initialize(invader_x, invader_y, invader_strength);
       }
 
-      // Print game level and lives of Player
-      print_level(level);
-      delay(2000);
-      print_lives(player.get_lives());
-      delay(2000);
-      // Refresh the screen
-      matrix.fillScreen(BLACK.to_333());
+      // Print game level and lives of Player only when lives > 0
+      if (player.get_lives() > 0) {
+        print_level(level);
+        delay(2000);
+        print_lives(player.get_lives());
+        delay(2000);
+        // Refresh the screen
+        matrix.fillScreen(BLACK.to_333());
+      }
       return;
     }
   };
