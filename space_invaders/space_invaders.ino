@@ -432,8 +432,8 @@ class Game {
            x, y + 3
            x + 3, y + 3, body_color.to_333());
         */
-      int x = enemies[i].get_x();
-      int y = enemies[i].get_y();
+        int x = enemies[i].get_x();
+        int y = enemies[i].get_y();
  
         if (enemies[i].get_strength() > 0) {
           // Invader touches the bottom
@@ -555,7 +555,7 @@ class Game {
     void reset_level() {
       // Need to be fixed
       time = 0;
-      
+
       int invader_strength = 0;
       int invader_x = 0;
       int invader_y = 0;
