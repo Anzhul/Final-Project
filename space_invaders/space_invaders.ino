@@ -463,7 +463,10 @@ class Game {
       }
 
       // Player loses one life if any Invader touches bottom or touches Player in one loop
-      if (touch_bottom || touch_player) {
+      if (touch_bottom) {
+        player.die();
+      }
+      if (touch_player) {
         player.die();
       }
 
