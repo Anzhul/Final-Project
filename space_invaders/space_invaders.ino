@@ -408,21 +408,13 @@ class Game {
         // Wait 3 seconds
         delay(3000);
         // Restart Game
-<<<<<<< HEAD
         // setupGame();
-=======
-        setupGame();
->>>>>>> refs/remotes/origin/master
       }
 
       // Update position of Player based on the value of the potentiometer
       player.erase();
       player.set_x(((MAT_WIDTH) * potentiometer_value) / 1024);
-<<<<<<< HEAD
       // Serial.print(player.get_x());
-=======
-      Serial.print(player.get_x());
->>>>>>> refs/remotes/origin/master
       player.draw();
 
       // Update position of Cannonball,
@@ -472,12 +464,6 @@ class Game {
 
       // Player loses one life if any Invader touches bottom or touches Player in one loop
       if (touch_bottom) {
-<<<<<<< HEAD
-=======
-        player.die();
-      }
-      if (touch_player) {
->>>>>>> refs/remotes/origin/master
         player.die();
         reset_level();
         delay(2000);
@@ -499,17 +485,10 @@ class Game {
           // *i >= (NUM_ENEMIES / 2)*: The second row should move at first
           // *second_row_cleared()*: The first row moves after second row is cleared.
           if ((level == 1) || (i >= (NUM_ENEMIES / 2)) || (second_row_cleared())) {
-<<<<<<< HEAD
             // Move the Invaders at every 1/20 of the game time
             // There should be an initial delay before the first Invader moves
             // Delay until the time is larger 30
             if ((time % 20 == 0) && (time > 60)){
-=======
-            // Move the Invaders at every 1/10 of the game time
-            // There should be an initial delay before the first Invader moves
-            // Delay until the time is larger 30
-            if ((time % 10 == 0) && (time > 30)){
->>>>>>> refs/remotes/origin/master
               enemies[i].move();
             } 
           }
@@ -600,7 +579,6 @@ class Game {
       }
 
       // Print game level and lives of Player
-<<<<<<< HEAD
       if (player.get_lives() > 0) {
         print_level(level);
         delay(2000);
@@ -609,17 +587,9 @@ class Game {
         // Refresh the screen
         matrix.fillScreen(BLACK.to_333());
       }
-=======
-      print_level(level);
-      delay(2000);
-      print_lives(player.get_lives());
-      delay(2000);
-      // Refresh the screen
-      matrix.fillScreen(BLACK.to_333());
->>>>>>> refs/remotes/origin/master
       return;
     }
-  };
+};
 
 // a global variable that represents the game Space Invaders
 Game game;
@@ -715,8 +685,4 @@ void game_start() {
   matrix.print('A');
   matrix.print('R');
   matrix.print('T');
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> refs/remotes/origin/master
