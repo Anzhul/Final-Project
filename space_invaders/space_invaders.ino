@@ -44,6 +44,7 @@ RGBmatrixPanel matrix(A, B, C, CLK, LAT, OE, false);
 void print_level(int level);
 void print_lives(int lives);
 void game_over();
+void game_start();
 
 class Color {
   public:
@@ -123,18 +124,17 @@ class Invader {
     void move() {
       // Each time it's called in the loop this moves to invader down one pixel
       // The max value for y is MAT_HEIGHT - INVADER_HEIGHT = 12. 
-      if ((y < (MAT_HEIGHT - INVADER_HEIGHT) && (strength > 0)) {
+      if (y < (MAT_HEIGHT - INVADER_HEIGHT) && (strength > 0)) {
         erase();
         y++;
         draw();
-
       }
     }
     // draws the Invader if its strength is greater than 0
     // calls: draw_with_rgb
     // Modified to switch-case to improve efficiency
     void draw() {
-      switch(strength){
+      switch (strength) {
         case 1:
           draw_with_rgb(RED, BLUE);
           break;
@@ -298,7 +298,6 @@ class Cannonball {
 class Player {
   public:
     Player() {
-      // What are the default coordinates of player?
       x = (MAT_WIDTH / 2) - 1;
       y = MAT_HEIGHT - 1;
       lives = 3;
@@ -318,6 +317,10 @@ class Player {
     // setter
     void set_x(int x_arg) {
       x = x_arg;
+    }
+
+    void set_lives(int lives_arg) {
+      lives = lives_arg;
     }
     
     // Modifies: lives
@@ -349,7 +352,6 @@ class Player {
     void initialize(int x_arg, int y_arg) {
       x = x_arg;
       y = y_arg;
-      // Does lives also need to be initialized here?
     }
     
     // draws the player
@@ -378,8 +380,18 @@ class Game {
     // sets up a new game of Space Invaders
     // Modifies: global variable matrix
     void setupGame() {
+      // Initialize time
+      time = 0;
+
       // Initialize the game level
       level = 1;
+
+      // Initialize the position and lives of Player
+      player.set_x((MAT_WIDTH / 2) - 1);
+      player.set_lives(3);
+
+      // Display "game start"
+      game_start();
 
       // Initialize the position and strength of Invaders
       reset_level();
@@ -390,22 +402,25 @@ class Game {
     // see spec for details of game
     // Modifies: global variable matrix
     void update(int potentiometer_value, bool button_pressed) {
-      // FIXME: Game over
       if (player.get_lives() <= 0) {
+        // Print game over
         game_over();
-        delay(2000);
-        return;
+        // Wait 3 seconds
+        delay(3000);
+        // Restart Game
+        // setupGame();
       }
 
       // Update position of Player based on the value of the potentiometer
       player.erase();
       player.set_x(((MAT_WIDTH) * potentiometer_value) / 1024);
+      // Serial.print(player.get_x());
       player.draw();
 
       // Update position of Cannonball,
       // Detect if a new cannonball is being fired
       if (button_pressed && !ball.has_been_fired()) {
-        ball.fire(player.get_x(), 14);
+        ball.fire(player.get_x(), MAT_HEIGHT - 2);
       }
       ball.move();
 
@@ -421,7 +436,7 @@ class Game {
  
         if (enemies[i].get_strength() > 0) {
           // Invader touches the bottom
-          if (y + INVADER_HEIGHT == MAX_HEIGHT) {
+          if (y + INVADER_HEIGHT == MAT_HEIGHT) {
             touch_bottom = true;
             // Invader should be erased and cleared after touching bottom
             enemies[i].erase();
@@ -448,36 +463,44 @@ class Game {
       }
 
       // Player loses one life if any Invader touches bottom or touches Player in one loop
-      if (touch_bottom || touch_player) {
+      if (touch_bottom) {
         player.die();
+        reset_level();
+        delay(2000);
+      }
+      if (touch_player) {
+        player.die();
+        reset_level();
+        delay(2000);
       }
 
       // Update Invaders
-      // TODO: Implement this
-      // "The bottom row should move at first (top row does not).
-      // "Make sure that the bottom row does not move immediately after the game/level starts.
-      // "They should move down after your set time increment once the game/level starts.
-      // "The top row of invaders should start moving down once the entire bottom row is cleared.""
       for (int i = 0; i < NUM_ENEMIES; i++) {
         if (enemies[i].get_strength() <= 0) {
           enemies[i].erase();
         }
         else {
           enemies[i].draw();
-          // Moves the invaders at a 1/10th the time of the game
-          if ((time % 10) == 0){
-            enemies[i].move();
+          // *level == 1*: There is only 1 row of Invaders in level 1
+          // *i >= (NUM_ENEMIES / 2)*: The second row should move at first
+          // *second_row_cleared()*: The first row moves after second row is cleared.
+          if ((level == 1) || (i >= (NUM_ENEMIES / 2)) || (second_row_cleared())) {
+            // Move the Invaders at every 1/20 of the game time
+            // There should be an initial delay before the first Invader moves
+            // Delay until the time is larger 30
+            if ((time % 20 == 0) && (time > 60)){
+              enemies[i].move();
+            } 
           }
         }
       }
 
+      // Need to be tested!
       // Next level
       if (level_cleared()) {
         level++;
         reset_level();
       }
-
-      
       time++;
     }
 
@@ -513,6 +536,16 @@ class Game {
       return false;
     }
 
+    // Check if Player defeated all Invaders in the second row 
+    bool second_row_cleared() {
+      for (int i = (NUM_ENEMIES / 2); i < NUM_ENEMIES; i++) {
+        if (enemies[i].get_strength() > 0) {
+          return false;
+        }
+        return true;
+      }
+    }
+
     // Check if Player defeated all Invaders in current level
     bool level_cleared() {
       for (int i = 0; i < NUM_ENEMIES; i++) {
@@ -546,13 +579,14 @@ class Game {
       }
 
       // Print game level and lives of Player
-      print_level(level);
-      delay(2000);
-      print_lives(player.get_lives());
-      delay(2000);
-      // Refresh the screen
-      matrix.fillScreen(BLACK.to_333());
-
+      if (player.get_lives() > 0) {
+        print_level(level);
+        delay(2000);
+        print_lives(player.get_lives());
+        delay(2000);
+        // Refresh the screen
+        matrix.fillScreen(BLACK.to_333());
+      }
       return;
     }
 };
@@ -573,10 +607,10 @@ void loop() {
   int potentiometer_value = analogRead(POTENTIOMETER_PIN_NUMBER);
   bool button_pressed = (digitalRead(BUTTON_PIN_NUMBER) == HIGH);
   game.update(potentiometer_value, button_pressed);
-  delay(50);
+  delay(100);
 }
 
-// display Level
+// Display Level
 void print_level(int level) {
   // Refresh the screen
   matrix.fillScreen(BLACK.to_333());
@@ -597,7 +631,7 @@ void print_level(int level) {
   matrix.print(level);
 }
 
-// display number of lives
+// Display number of lives
 void print_lives(int lives) {
   // Refresh the screen
   matrix.fillScreen(BLACK.to_333());
@@ -615,7 +649,7 @@ void print_lives(int lives) {
   matrix.print(lives);
 }
 
-// displays "game over"
+// Display "game over"
 void game_over() {
   // Refresh the screen
   matrix.fillScreen(BLACK.to_333());
@@ -634,3 +668,21 @@ void game_over() {
   matrix.print('!');
 }
 
+// Display "game start"
+void game_start() {
+  // Refresh the screen
+  matrix.fillScreen(BLACK.to_333());
+  matrix.setTextSize(1);
+  matrix.setTextColor(GREEN.to_333());
+  matrix.setCursor(0, 0); 
+  matrix.print('G');
+  matrix.print('A');
+  matrix.print('M');
+  matrix.print('E');
+  matrix.print(' ');
+  matrix.print('S');
+  matrix.print('T');
+  matrix.print('A');
+  matrix.print('R');
+  matrix.print('T');
+}
