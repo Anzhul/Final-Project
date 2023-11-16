@@ -484,8 +484,7 @@ class Game {
           enemies[i].draw();
           if ((level == 1) || (i >= (NUM_ENEMIES / 2)) || (second_row_cleared())) {
             // Move the Invaders at every 1/10 of the game time
-            // Initial delay until the time is larger 30
-            // Need to be fixed
+            // Initial delay until the time is larger 60
             // Timing should be recording time rather than Number of runs
             if ((time % 20 == 0) && (time > 60)){
               enemies[i].move();
