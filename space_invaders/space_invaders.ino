@@ -466,14 +466,14 @@ class Game {
       // Player loses one life if any Invader touches bottom or touches Player in one loop
       if (touch_bottom) {
         player.die();
+        // Reset touch_bottom
+        touch_bottom = false;
       }
       if (touch_player) {
         player.die();
+        // Reset touch_player
+        touch_player = false;
       }
-
-      // Reset touch_bottom and touch_player
-      touch_bottom = false;
-      touch_player = false;
 
       // Update Invaders
       for (int i = 0; i < NUM_ENEMIES; i++) {
