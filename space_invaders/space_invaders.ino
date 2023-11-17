@@ -2,8 +2,6 @@
 #include <RGBmatrixPanel.h>
 #include <Adafruit_GFX.h>
 
-
-
 // define the wiring of the LED screen
 const uint8_t CLK  = 8;
 const uint8_t LAT = A3;
@@ -45,6 +43,7 @@ void print_level(int level);
 void print_lives(int lives);
 void game_over();
 void game_start();
+void option_screen();
 
 class Color {
   public:
@@ -120,7 +119,6 @@ class Invader {
 
     // Moves the Invader down the screen by one row
     // Modifies: y
-    // Added erase() and draw() inside move() to improve efficiency
     void move() {
       // Each time it's called in the loop this moves to invader down one pixel
       // The max value for y is MAT_HEIGHT - INVADER_HEIGHT = 12. 
@@ -132,7 +130,6 @@ class Invader {
     }
     // draws the Invader if its strength is greater than 0
     // calls: draw_with_rgb
-    // Modified to switch-case to improve efficiency
     void draw() {
       switch (strength) {
         case 1:
@@ -167,7 +164,7 @@ class Invader {
       draw_with_rgb(BLACK, BLACK);
     }    
     
-    // Invader is hit by a Cannonball.
+    // Invader is hit by a Cannonball
     // Modifies: strength
     // calls: draw, erase
     void hit() {
@@ -187,8 +184,7 @@ class Invader {
     
     // draws the Invader
     void draw_with_rgb(Color body_color, Color eye_color) {
-      //Each of these specifies a specific point on the grid. 
-      //The origin (x,y) is the upper left corner of the invader.
+      // The origin (x,y) is the upper left corner of the invader.
       matrix.drawPixel(x + 1, y, body_color.to_333());
       matrix.drawPixel(x + 2, y, body_color.to_333());
       matrix.drawPixel(x, y + 1, body_color.to_333());
@@ -237,8 +233,7 @@ class Cannonball {
     }
     
     // Setters
-    // Default argument for y is MAT_HEIGHT - 2 = 14
-    // i.e. the y-coordinate of the cannon
+    // Default value for y is MAT_HEIGHT - 2 = 14
     void fire(int x_arg, int y_arg = MAT_HEIGHT - 2) {
       x = x_arg;
       y = y_arg;
@@ -247,7 +242,6 @@ class Cannonball {
     
     // Moves the Cannonball and detects if it goes off the screen
     // Modifies: y, fired
-    // draw() is called in this function i.e. Cannonball is moved and drawn
     void move() {
      if (fired) {
       // Erase from its original position
@@ -358,12 +352,12 @@ class Player {
     void draw_with_rgb(Color color) {
       // Ensure x, y are within the bounds of the matrix
       if ((x > 0 && x < MAT_WIDTH) && (y == MAT_HEIGHT - 1)) {
-        //draw the bottom 3
+        // draw the bottom 3
         matrix.drawPixel(x - 1, y, color.to_333());
         // (x, y) is the middle pixel of the bottom 3
         matrix.drawPixel(x, y, color.to_333());
         matrix.drawPixel(x + 1, y, color.to_333());
-        //draw the top 1
+        // draw the top 1
         matrix.drawPixel(x, y - 1, color.to_333());
       }
     }
@@ -372,7 +366,7 @@ class Player {
 class Game {
   public:
     Game() {
-      // Level should start from 1.
+      // Level should start from 1
       level = 1;
       time = 0;
     }
@@ -400,7 +394,6 @@ class Game {
 
     
     // advances the game simulation one step and renders the graphics
-    // see spec for details of game
     // Modifies: global variable matrix
     void update(int potentiometer_value, bool button_pressed) {
       if (player.get_lives() <= 0) {
@@ -408,8 +401,25 @@ class Game {
         game_over();
         // Wait 3 seconds
         delay(3000);
-        // Restart Game
-        setupGame();
+        // Pop up option screen
+        option_screen();
+        // Start an infinite loop waiting for user input
+        while (true) {
+          draw_cursor(potentiometer_value);
+          if (button_pressed) {
+            // Restart selected
+            if (potentiometer_value < 512) {
+                setupGame(); 
+                return;
+            } 
+            else {
+              // Quit selected, enter an empty loop and pause
+              while (true) {}
+            }
+          }
+        // Slightly delay to prevent button jitter
+        delay(100); 
+        }
       }
 
       // Update position of Player based on the value of the potentiometer
@@ -418,8 +428,7 @@ class Game {
       Serial.print(player.get_x());
       player.draw();
 
-      // Update position of Cannonball,
-      // Detect if a new cannonball is being fired
+      // Update position of Cannonball
       if (button_pressed && !ball.has_been_fired()) {
         ball.fire(player.get_x(), MAT_HEIGHT - 2);
       }
@@ -427,11 +436,6 @@ class Game {
 
       // Touch detection
       for (int i = 0; i < NUM_ENEMIES; i++){
-        /* x + 2, y + 2
-           x + 3, y + 2
-           x, y + 3
-           x + 3, y + 3, body_color.to_333());
-        */
         int x = enemies[i].get_x();
         int y = enemies[i].get_y();
  
@@ -463,7 +467,7 @@ class Game {
         }
       }
 
-      // Player loses one life if any Invader touches bottom or touches Player in one loop
+      // Player lives - 1 if Invader touches bottom or Player in one loop
       if (touch_bottom) {
         player.die();
         // Reset touch_bottom
@@ -483,9 +487,8 @@ class Game {
         else {
           enemies[i].draw();
           if ((level == 1) || (i >= (NUM_ENEMIES / 2)) || (second_row_cleared())) {
-            // Move the Invaders at every 1/10 of the game time
+            // Move the Invaders at every 1/20 of the game time
             // Initial delay until the time is larger 60
-            // Timing should be recording time rather than Number of runs
             if ((time % 20 == 0) && (time > 60)){
               enemies[i].move();
             } 
@@ -507,10 +510,28 @@ class Game {
     Player player;
     Cannonball ball;
     Invader enemies[NUM_ENEMIES];
-    // Check if any Invader touches bottom *in one loop*
+    // Check if any Invader touches bottom in one loop
     bool touch_bottom = false;
-    // Check if any Invader touches Player *in one loop*
+    // Check if any Invader touches Player in one loop
     bool touch_player = false;
+
+    // Draw the cursor for selecting Restart or Quit
+    void draw_cursor(int potentiometer_value_arg) {
+      // Erase the previous cursor
+      matrix.drawPixel(0, 0, BLACK.to_333());
+      matrix.drawPixel(0, 10, BLACK.to_333());
+
+      // Draw the new cursor
+      if (potentiometer_value_arg < 512) {
+        // Cursor selected Restart
+        matrix.drawPixel(0, 0, YELLOW.to_333());
+      }
+      else {
+        // Cursor selected Quit
+        matrix.drawPixel(0, 10, YELLOW.to_333());
+      }
+    }
+
 
     // Check if Invader touch the Player
     bool invader_touch_player(Invader invader, Player player) {
@@ -558,7 +579,6 @@ class Game {
 
     // set up a level
     void reset_level() {
-      // Need to be fixed
       time = 0;
 
       // Initialize touch_bottom and touch_player
@@ -692,4 +712,14 @@ void game_start() {
   matrix.print('A');
   matrix.print('R');
   matrix.print('T');
+}
+
+void option_screen() {
+  matrix.fillScreen(BLACK.to_333());
+  matrix.setTextSize(1);
+  matrix.setTextColor(WHITE.to_333());
+  matrix.setCursor(0, 0);
+  matrix.print("Restart");
+  matrix.setCursor(0, 10); 
+  matrix.print("Quit");
 }
