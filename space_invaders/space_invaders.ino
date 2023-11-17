@@ -388,6 +388,9 @@ class Game {
       // Initialize time
       time = 0;
 
+      // Generate a random number seed
+      randomSeed(millis());
+
       // Initialize the game level
       level = 1;
 
@@ -642,9 +645,18 @@ void setup() {
 
 // see https://www.arduino.cc/reference/en/language/structure/sketch/loop/
 void loop() {
-  int potentiometer_value = analogRead(POTENTIOMETER_PIN_NUMBER);
+  // Smooth the readings from an analog input
+  int total = 0;
+  int num_readings = 10;
+  for (int i = 0; i < num_readings; i++) {
+    total += analogRead(POTENTIOMETER_PIN_NUMBER);
+  }  
+  int potentiometer_value = total / num_readings;
+
   bool button_pressed = (digitalRead(BUTTON_PIN_NUMBER) == HIGH);
+
   game.update(potentiometer_value, button_pressed);
+  
   delay(50);
 }
 
