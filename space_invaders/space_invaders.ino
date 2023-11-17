@@ -351,14 +351,25 @@ class Player {
     // draws the player
     void draw_with_rgb(Color color) {
       // Ensure x, y are within the bounds of the matrix
-      if ((x > 0 && x < MAT_WIDTH) && (y == MAT_HEIGHT - 1)) {
-        // draw the bottom 3
-        matrix.drawPixel(x - 1, y, color.to_333());
+      if ((x >= 0 && x < MAT_WIDTH) && (y == MAT_HEIGHT - 1)) {
         // (x, y) is the middle pixel of the bottom 3
         matrix.drawPixel(x, y, color.to_333());
-        matrix.drawPixel(x + 1, y, color.to_333());
-        // draw the top 1
         matrix.drawPixel(x, y - 1, color.to_333());
+        switch (x) {
+          // Player at the left edge
+          case 0:
+            matrix.drawPixel(x + 1, y, color.to_333());
+            break;
+          // Player at the right edge
+          case MAT_WIDTH - 1:
+            matrix.drawPixel(x - 1, y, color.to_333());
+            break;
+          // Player at the middle of the screen
+          default:
+            matrix.drawPixel(x - 1, y, color.to_333());
+            matrix.drawPixel(x + 1, y, color.to_333());
+            break;
+        } 
       }
     }
 };
