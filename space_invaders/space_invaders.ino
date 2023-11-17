@@ -378,7 +378,7 @@ class Game {
   public:
     Game() {
       // Level should start from 1
-      level = 1;
+      level = 0;
       time = 0;
     }
     
@@ -392,7 +392,7 @@ class Game {
       randomSeed(millis());
 
       // Initialize the game level
-      level = 1;
+      level = 0;
 
       // Initialize the position and lives of Player
       player.set_x((MAT_WIDTH / 2) - 1);
@@ -507,13 +507,12 @@ class Game {
           if ((level == 1) || (i >= (NUM_ENEMIES / 2)) || (second_row_cleared())) {
             // Move the Invaders at every 1/20 of the game time
             // Initial delay until the time is larger 60
-            if ((time % 20 == 0) && (time > 60)){
+            if ((time % 40 == 0) && (time > 100)){
               enemies[i].move();
             } 
           }
         }
       }
-
 
       }
 
@@ -665,7 +664,7 @@ void loop() {
 
   game.update(potentiometer_value, button_pressed);
   
-  delay(50);
+  delay(25);
 }
 
 // Display Level
