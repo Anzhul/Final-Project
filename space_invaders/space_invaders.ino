@@ -410,33 +410,37 @@ class Game {
     // advances the game simulation one step and renders the graphics
     // Modifies: global variable matrix
     void update(int potentiometer_value, bool button_pressed) {
-      if (player.get_lives() <= 0) {
+      if (player.get_lives() <= 0 && menu_active == false) {
         // Print game over
         game_over();
         // Wait 3 seconds
         delay(3000);
         // Pop up option screen
         option_screen();
+        menu_active = true;
         // Start an infinite loop waiting for user input
-        while (true) {
+      }
+
+      if (menu_active == true){
           draw_cursor(potentiometer_value);
           if (button_pressed) {
             // Restart selected
             if (potentiometer_value < 512) {
                 setupGame(); 
+                menu_active = false;
                 return;
             } 
             else {
               // Quit selected, enter an empty loop and pause
+              matrix.fillScreen(BLACK.to_333());
               while (true) {}
             }
           }
         // Slightly delay to prevent button jitter
         delay(100); 
-        }
       }
-
-      // Update position of Player based on the value of the potentiometer
+      else{
+              // Update position of Player based on the value of the potentiometer
       player.erase();
       player.set_x(((MAT_WIDTH) * potentiometer_value) / 1024);
       Serial.print(player.get_x());
@@ -510,6 +514,9 @@ class Game {
         }
       }
 
+
+      }
+
       // Next level
       if (level_cleared()) {
         level++;
@@ -528,6 +535,7 @@ class Game {
     bool touch_bottom = false;
     // Check if any Invader touches Player in one loop
     bool touch_player = false;
+    bool menu_active = false;
 
     // Draw the cursor for selecting Restart or Quit
     void draw_cursor(int potentiometer_value_arg) {
@@ -744,5 +752,29 @@ void option_screen() {
   matrix.setCursor(0, 0);
   matrix.print("Restart");
   matrix.setCursor(0, 10); 
+  matrix.print("Quit");
+}
+
+void print_restart(){
+  matrix.setTextColor(WHITE.to_333());
+  matrix.setCursor(0, 0);
+  matrix.print("Restart");
+}
+
+void choose_restart(){
+  matrix.setTextColor(YELLOW.to_333());
+  matrix.setCursor(0, 0);
+  matrix.print("Restart");
+}
+
+void print_quit(){
+  matrix.setTextColor(WHITE.to_333());
+  matrix.setCursor(0, 10);
+  matrix.print("Quit");
+}
+
+void choose_quit(){
+  matrix.setTextColor(YELLOW.to_333());
+  matrix.setCursor(0, 10);
   matrix.print("Quit");
 }
