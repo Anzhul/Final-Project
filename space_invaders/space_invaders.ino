@@ -43,7 +43,6 @@ void print_level(int level);
 void print_lives(int lives);
 void game_over();
 void game_start();
-void option_screen();
 void print_restart();
 void choose_restart();
 void print_quit();
@@ -493,14 +492,16 @@ class Game {
       // Player lives - 1 if Invader touches bottom or Player in one loop
       if (touch_bottom) {
         player.die();
-        // Reset touch_bottom
+        // Restart level
         reset_level();
+        // Reset touch_bottom
         touch_bottom = false;
       }
       if (touch_player) {
         player.die();
-        // Reset touch_player
+        // Restart level
         reset_level();
+        // Reset touch_player
         touch_player = false;
       }
 
@@ -512,8 +513,8 @@ class Game {
         else {
           enemies[i].draw();
           if ((level == 1) || (i >= (NUM_ENEMIES / 2)) || (second_row_cleared())) {
-            // Move the Invaders at every 1/20 of the game time
-            // Initial delay until the time is larger 60
+            // Move the Invaders at every 1/40 of the game time
+            // Initial delay until time is larger than 100
             if ((time % 40 == 0) && (time > 100)){
               enemies[i].move();
             } 
@@ -545,9 +546,6 @@ class Game {
 
     // Draw the cursor for selecting Restart or Quit
     void draw_cursor(int potentiometer_value_arg) {
-      // Erase the previous cursor
-
-      // Draw the new cursor
       if (potentiometer_value_arg < 512) {
         // Cursor selected Restart
         choose_restart();
@@ -627,7 +625,6 @@ class Game {
         invader_x = (i % (NUM_ENEMIES / 2)) * 4;
         invader_y = 0;
         if (i >= (NUM_ENEMIES / 2)) { 
-          // INVADER_HEIGHT = 4
           invader_y = INVADER_HEIGHT;
         }
         enemies[i].initialize(invader_x, invader_y, invader_strength);
@@ -751,24 +748,28 @@ void game_start() {
   matrix.print('T');
 }
 
+// Display "R" in white for Restart
 void print_restart(){
   matrix.setTextColor(WHITE.to_333());
   matrix.setCursor(0, 0);
   matrix.print("R");
 }
 
+// Display "R" in yellow for user to select Restart
 void choose_restart(){
   matrix.setTextColor(YELLOW.to_333());
   matrix.setCursor(0, 0);
   matrix.print("R");
 }
 
+// Display "Q" in white for Quit
 void print_quit(){
   matrix.setTextColor(WHITE.to_333());
   matrix.setCursor(0, 8);
   matrix.print("Q");
 }
 
+// Display "Q" in yellow for user to select Quit
 void choose_quit(){
   matrix.setTextColor(YELLOW.to_333());
   matrix.setCursor(0, 8);
