@@ -494,11 +494,13 @@ class Game {
       if (touch_bottom) {
         player.die();
         // Reset touch_bottom
+        reset_level();
         touch_bottom = false;
       }
       if (touch_player) {
         player.die();
         // Reset touch_player
+        reset_level();
         touch_player = false;
       }
 
@@ -544,17 +546,17 @@ class Game {
     // Draw the cursor for selecting Restart or Quit
     void draw_cursor(int potentiometer_value_arg) {
       // Erase the previous cursor
-      print_restart();
-      print_quit();
 
       // Draw the new cursor
       if (potentiometer_value_arg < 512) {
         // Cursor selected Restart
         choose_restart();
+        print_quit();
       }
       else {
         // Cursor selected Quit
         choose_quit();
+        print_restart();
       }
     }
 
@@ -747,16 +749,6 @@ void game_start() {
   matrix.print('A');
   matrix.print('R');
   matrix.print('T');
-}
-
-void option_screen() {
-  matrix.fillScreen(BLACK.to_333());
-  matrix.setTextSize(1);
-  matrix.setTextColor(WHITE.to_333());
-  matrix.setCursor(0, 0);
-  matrix.print("Restart");
-  matrix.setCursor(0, 10); 
-  matrix.print("Quit");
 }
 
 void print_restart(){
