@@ -44,6 +44,10 @@ void print_lives(int lives);
 void game_over();
 void game_start();
 void option_screen();
+void print_restart();
+void choose_restart();
+void print_quit();
+void choose_quit();
 
 class Color {
   public:
@@ -392,7 +396,7 @@ class Game {
       randomSeed(millis());
 
       // Initialize the game level
-      level = 0;
+      level = 1;
 
       // Initialize the position and lives of Player
       player.set_x((MAT_WIDTH / 2) - 1);
@@ -415,8 +419,9 @@ class Game {
         game_over();
         // Wait 3 seconds
         delay(3000);
-        // Pop up option screen
-        option_screen();
+        //Fill Screen with black
+        matrix.fillScreen(BLACK.to_333());
+
         menu_active = true;
         // Start an infinite loop waiting for user input
       }
@@ -539,17 +544,17 @@ class Game {
     // Draw the cursor for selecting Restart or Quit
     void draw_cursor(int potentiometer_value_arg) {
       // Erase the previous cursor
-      matrix.drawPixel(0, 0, BLACK.to_333());
-      matrix.drawPixel(0, 10, BLACK.to_333());
+      print_restart();
+      print_quit();
 
       // Draw the new cursor
       if (potentiometer_value_arg < 512) {
         // Cursor selected Restart
-        matrix.drawPixel(0, 0, YELLOW.to_333());
+        choose_restart();
       }
       else {
         // Cursor selected Quit
-        matrix.drawPixel(0, 10, YELLOW.to_333());
+        choose_quit();
       }
     }
 
@@ -757,23 +762,23 @@ void option_screen() {
 void print_restart(){
   matrix.setTextColor(WHITE.to_333());
   matrix.setCursor(0, 0);
-  matrix.print("Restart");
+  matrix.print("R");
 }
 
 void choose_restart(){
   matrix.setTextColor(YELLOW.to_333());
   matrix.setCursor(0, 0);
-  matrix.print("Restart");
+  matrix.print("R");
 }
 
 void print_quit(){
   matrix.setTextColor(WHITE.to_333());
-  matrix.setCursor(0, 10);
-  matrix.print("Quit");
+  matrix.setCursor(0, 8);
+  matrix.print("Q");
 }
 
 void choose_quit(){
   matrix.setTextColor(YELLOW.to_333());
-  matrix.setCursor(0, 10);
-  matrix.print("Quit");
+  matrix.setCursor(0, 8);
+  matrix.print("Q");
 }
