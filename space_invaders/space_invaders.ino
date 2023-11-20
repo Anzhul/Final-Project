@@ -443,85 +443,84 @@ class Game {
         // Slightly delay to prevent button jitter
         delay(100); 
       }
-      else{
-              // Update position of Player based on the value of the potentiometer
-      player.erase();
-      player.set_x(((MAT_WIDTH) * potentiometer_value) / 1024);
-      Serial.print(player.get_x());
-      player.draw();
+      else {
+        // Update position of Player based on the value of the potentiometer
+        player.erase();
+        player.set_x(((MAT_WIDTH) * potentiometer_value) / 1024);
+        Serial.print(player.get_x());
+        player.draw();
 
-      // Update position of Cannonball
-      if (button_pressed && !ball.has_been_fired()) {
-        ball.fire(player.get_x(), MAT_HEIGHT - 2);
-      }
-      ball.move();
+        // Update position of Cannonball
+        if (button_pressed && !ball.has_been_fired()) {
+          ball.fire(player.get_x(), MAT_HEIGHT - 2);
+        }
+        ball.move();
 
-      // Touch detection
-      for (int i = 0; i < NUM_ENEMIES; i++){
-        int x = enemies[i].get_x();
-        int y = enemies[i].get_y();
- 
-        if (enemies[i].get_strength() > 0) {
-          // Invader touches the bottom
-          if (y + INVADER_HEIGHT == MAT_HEIGHT) {
-            touch_bottom = true;
-            // Invader should be erased and cleared after touching bottom
+        // Touch detection
+        for (int i = 0; i < NUM_ENEMIES; i++){
+          int x = enemies[i].get_x();
+          int y = enemies[i].get_y();
+  
+          if (enemies[i].get_strength() > 0) {
+            // Invader touches the bottom
+            if (y + INVADER_HEIGHT == MAT_HEIGHT) {
+              touch_bottom = true;
+              // Invader should be erased and cleared after touching bottom
+              enemies[i].erase();
+              enemies[i].set_strength(0);
+            }
+            
+            // Invader touches Player
+            if (invader_touch_player(enemies[i], player)) {
+              touch_player = true;
+              // Invader should be erased and cleared after touching Player
+              enemies[i].erase();
+              enemies[i].set_strength(0);
+            };
+
+            // Invader hit by Cannonball
+            if ((ball.get_x() == x + 1 && ball.get_y() == y + 2) ||
+              (ball.get_x() == x + 2 && ball.get_y() == y + 2)  ||
+              (ball.get_x() == x && ball.get_y() == y + 3) ||
+              (ball.get_x() == x + 3 && ball.get_y() == y + 3)) {
+                enemies[i].hit();
+                ball.hit();
+            }
+          }
+        }
+
+        // Player lives - 1 if Invader touches bottom or Player in one loop
+        if (touch_bottom) {
+          player.die();
+          // Restart level
+          reset_level();
+          // Reset touch_bottom
+          touch_bottom = false;
+        }
+        if (touch_player) {
+          player.die();
+          // Restart level
+          reset_level();
+          // Reset touch_player
+          touch_player = false;
+        }
+
+        // Update Invaders
+        for (int i = 0; i < NUM_ENEMIES; i++) {
+          if (enemies[i].get_strength() <= 0) {
             enemies[i].erase();
-            enemies[i].set_strength(0);
           }
-          
-          // Invader touches Player
-          if (invader_touch_player(enemies[i], player)) {
-            touch_player = true;
-            // Invader should be erased and cleared after touching Player
-            enemies[i].erase();
-            enemies[i].set_strength(0);
-          };
-
-          // Invader hit by Cannonball
-          if ((ball.get_x() == x + 1 && ball.get_y() == y + 2) ||
-             (ball.get_x() == x + 2 && ball.get_y() == y + 2)  ||
-             (ball.get_x() == x && ball.get_y() == y + 3) ||
-             (ball.get_x() == x + 3 && ball.get_y() == y + 3)) {
-              enemies[i].hit();
-              ball.hit();
+          else {
+            enemies[i].draw();
+            if ((level == 1) || (i >= (NUM_ENEMIES / 2)) || (second_row_cleared())) {
+              // Move the Invaders at every 1/40 of the game time
+              // Initial delay until time is larger than 100
+              if ((time % 40 == 0) && (time > 100)){
+                enemies[i].move();
+              } 
+            }
           }
         }
-      }
-
-      // Player lives - 1 if Invader touches bottom or Player in one loop
-      if (touch_bottom) {
-        player.die();
-        // Restart level
-        reset_level();
-        // Reset touch_bottom
-        touch_bottom = false;
-      }
-      if (touch_player) {
-        player.die();
-        // Restart level
-        reset_level();
-        // Reset touch_player
-        touch_player = false;
-      }
-
-      // Update Invaders
-      for (int i = 0; i < NUM_ENEMIES; i++) {
-        if (enemies[i].get_strength() <= 0) {
-          enemies[i].erase();
-        }
-        else {
-          enemies[i].draw();
-          if ((level == 1) || (i >= (NUM_ENEMIES / 2)) || (second_row_cleared())) {
-            // Move the Invaders at every 1/40 of the game time
-            // Initial delay until time is larger than 100
-            if ((time % 40 == 0) && (time > 100)){
-              enemies[i].move();
-            } 
-          }
-        }
-      }
-
       }
 
       // Next level
